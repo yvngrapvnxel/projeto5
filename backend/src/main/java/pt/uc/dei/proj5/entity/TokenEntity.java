@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name="token")
+@Table(name = "token")
 // named queries
 public class TokenEntity implements Serializable {
 
@@ -23,14 +23,14 @@ public class TokenEntity implements Serializable {
     // --- COLUNAS
 
     @Id
-    @Column(name="token", nullable = false, updatable = false)
+    @Column(name = "token", nullable = false, updatable = false)
     private String token;
 
     @CreationTimestamp
-    @Column(name="sessionDate", nullable = false, updatable = false)
+    @Column(name = "sessionDate", nullable = false, updatable = false)
     private LocalDateTime sessionDate;
 
-    @Column(name="expireTime", nullable = false, updatable = false)
+    @Column(name = "expireTime", nullable = false, updatable = false)
     private LocalDateTime expireTime;
 
     @ManyToOne

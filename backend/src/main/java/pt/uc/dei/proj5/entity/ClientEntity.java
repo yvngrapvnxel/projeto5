@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name="cliente")
+@Table(name = "cliente")
 // named queries
 public class ClientEntity implements Serializable {
 

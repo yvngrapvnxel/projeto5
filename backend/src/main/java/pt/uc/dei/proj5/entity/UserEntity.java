@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 // named queries
 public class UserEntity implements Serializable {
 
@@ -22,35 +22,38 @@ public class UserEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false, unique = true, updatable = false)
+    @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(name="firstName", nullable = false)
+    @Column(name = "firstName", nullable = false)
     private String firstName;
 
-    @Column(name="lastName", nullable = false)
+    @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name="email", nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name="phone", nullable = false)
+    @Column(name = "phone", nullable = false)
     private String phone;
 
-    @Column(name="username", unique = true, nullable = false, updatable = false)
+    @Column(name = "username", unique = true, nullable = false, updatable = false)
     private String username;
 
-    @Column(name="password", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name="photoUrl", nullable = false)
+    @Column(name = "photoUrl", nullable = false)
     private String photoUrl;
 
-    @Column(name="isAdmin", nullable = false, updatable = false)
+    @Column(name = "isAdmin", nullable = false, updatable = false)
     private boolean isAdmin;
 
     @Column(name = "isActive", nullable = false)
     private boolean isActive;
+    
+    @Column(name = "lang", nullable = false)
+    private String lang;
 
     @JsonbTransient
     @OneToMany(mappedBy = "users")
@@ -110,6 +113,10 @@ public class UserEntity implements Serializable {
         return isActive;
     }
 
+    public String getLang() {
+        return lang;
+    }
+
     public List<TokenEntity> getTokens() {
         return tokens;
     }
@@ -158,6 +165,10 @@ public class UserEntity implements Serializable {
 
     public void setIsActive(boolean active) {
         this.isActive = active;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 
     public void setTokens(List<TokenEntity> tokens) {
