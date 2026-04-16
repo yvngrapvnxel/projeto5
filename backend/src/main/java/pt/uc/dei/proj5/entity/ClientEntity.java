@@ -23,7 +23,7 @@ public class ClientEntity implements Serializable {
     // --- COLUNAS
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 

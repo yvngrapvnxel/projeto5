@@ -68,6 +68,9 @@ const useAdminStore = create((set, get) => ({
 
     // --- CLIENTS E LEADS
     fetchUserSubData: async (userId) => {
+
+        set({ selectedUserClients: [], selectedUserLeads: [] });
+
         const token = localStorage.getItem('token');
         const [clientsRes, leadsRes] = await Promise.all([
             fetch(`${admin_URL}/users/${userId}/clients/all`, { headers: { token } }),

@@ -121,7 +121,13 @@ const AdminPage = () => {
             return (a.title || "").toLowerCase().localeCompare((b.title || "").toLowerCase());
         });
 
-
+    if (!currentUser.admin) {
+        return (
+            <div className="container-forbidden d-flex justify-content-center align-items-center">
+                <h1 className="text-white fw-bold bg-danger p-3 rounded shadow-sm">403 - Forbidden</h1>
+            </div>
+        );
+    }
 
     return (
         <div className="container py-4">
@@ -273,7 +279,7 @@ const AdminPage = () => {
                                                             <div className="card border-0 shadow-sm h-100">
                                                                 <div className="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 pt-3">
                                                                     <span className="fw-bold" style={{ color: '#2D5A88' }}>User's Leads</span>
-                                                                    {filteredAndSortedLeads.length > 0 ?
+                                                                    {selectedUserLeads.length > 0 ?
                                                                         <select className="form-select form-select-sm w-auto" value={leadFilter} onChange={(e) => setLeadFilter(e.target.value)}>
                                                                             <option value="all">All</option>
                                                                             <option value="0">New</option>
