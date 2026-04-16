@@ -5,6 +5,7 @@ const useUserStore = create(
   persist(
     (set) => ({
       user: {
+        id: '',
         firstName: '',
         lastName: '',
         email: '',
@@ -23,7 +24,7 @@ const useUserStore = create(
       logout: () => {
         localStorage.removeItem('token');
         set({ 
-          user: { firstName: '', lastName: '', email: '', phone: '', username: '', photoUrl: '' }, 
+          user: { id: '', firstName: '', lastName: '', email: '', phone: '', username: '', photoUrl: '' },
           isAuthenticated: false 
         });
       },

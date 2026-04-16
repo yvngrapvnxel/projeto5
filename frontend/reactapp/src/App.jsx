@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from "react";
 import LoginPage from './Login';
 import RegisterPage from './Register';
 import Dashboard from './Dashboard';
@@ -7,7 +8,10 @@ import ClientsPage from './Clients';
 import LeadsPage from './Leads';
 import ProfilePage from './UserProfile';
 import AdminPage from './AdminPage';
+import useUserStore from "./stores/userStore";
+import useNotificationStore from './stores/notifStore';
 import './Global.css';
+import ChatBox from "./ChatBox";
 
 /* qualquer path sem token redireciona para login */
 const ProtectedRoute = ({ children }) => {
@@ -20,10 +24,45 @@ const ProtectedRoute = ({ children }) => {
 
 
 function App() {
+
+    const id = useUserStore((state) => state.user.id);
+    const addNotification = useNotificationStore((state) => state.addNotification);
+
+    useEffect(() => {
+
+        if (!id) return;
+
+        // 'ws://' instead of 'http://'
+        const socket = new WebSocket(`ws://localhost:8080/notifications/${id}`);
+
+
+        socket.onopen = () => {
+            console.log("Connected to WebSocket for notifications.");
+        };
+
+
+        socket.onmessage = (event) => {
+            addNotification(event.data);
+        };
+
+
+        return () => {
+            if (socket.readyState === WebSocket.CONNECTING) {
+                // If it's still connecting, wait for it to open, then close it safely
+                socket.addEventListener('open', () => socket.close());
+            } else {
+                // Otherwise, close it normally
+                socket.close();
+            }
+        };
+    }, [id, addNotification]);
+
+
     return (
         <BrowserRouter>
 
             <Navbar />
+            <ChatBox />
 
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
@@ -65,7 +104,7 @@ function App() {
                 }
                 />
 
-                 {/* admin */}
+                {/* admin */}
                 <Route path="/admin" element={
                     <ProtectedRoute>
                         <AdminPage />

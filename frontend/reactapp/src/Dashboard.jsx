@@ -7,9 +7,10 @@ const Dashboard = () => {
   return (
     <div className="dashboard-wrapper">
 
-      {/* Main Content */}
+      {/* main content */}
       <main className="dashboard-container">
       </main>
+
     </div>
   );
 };
