@@ -62,7 +62,7 @@ function App() {
         <BrowserRouter>
 
             <Navbar />
-            <ChatBox />
+            {localStorage.getItem('token') ? <ChatBox /> : null}
 
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
