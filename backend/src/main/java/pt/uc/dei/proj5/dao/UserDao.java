@@ -50,6 +50,7 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
         user.setUsername(novoUser.getUsername());
         user.setPassword(novoUser.getPassword());
         user.setIsActive(true);
+        user.setLang("en");
 
         persist(user);
     }

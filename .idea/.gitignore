@@ -5,7 +5,7 @@
 /httpRequests/
 # Ignored default folder with query files
 /queries/
-/target/
+backend/target/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
