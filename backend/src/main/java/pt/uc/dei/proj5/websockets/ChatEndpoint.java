@@ -1,5 +1,7 @@
 package pt.uc.dei.proj5.websockets;
 
+import jakarta.inject.Inject;
+import jakarta.persistence.Id;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
@@ -17,8 +19,13 @@ import pt.uc.dei.proj5.dto.UserDto;
 @ServerEndpoint("/chat/{id}")
 public class ChatEndpoint {
 
-    private static AdminDao adminDao;
-    private static UserBean userBean;
+    @Inject
+    private AdminDao adminDao;
+
+    @Inject
+    private UserBean userBean;
+
+
     private static final Map<Long, Session> chatSessions = new ConcurrentHashMap<>();
 
     @OnOpen

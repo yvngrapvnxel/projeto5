@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import { API_URL } from "./config";
 import useUserStore from './stores/userStore';
 import useChatStore from './stores/chatStore';
 import './Global.css';
@@ -11,19 +12,35 @@ function ChatBox() {
     const [receiver, setReceiver] = useState('');
     const [inputText, setInputText] = useState('');
 
-    // We use a ref to hold the websocket so we can use it to send messages outside of useEffect
+    // NEW: State to hold the list of users for the dropdown
+    const [usersList, setUsersList] = useState([]);
+
     const socketRef = useRef(null);
+
+    const urlUsers = `${API_URL}/admin/users/all`;
+
+    useEffect(() => {
+        fetch(`${urlUsers}`, {
+            headers: {
+                token: localStorage.getItem('token')
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                const otherUsers = data.filter(u => u.id !== senderID);
+                setUsersList(otherUsers);
+            })
+            .catch(err => console.error("Failed to load users for chat", err));
+    }, [senderID, urlUsers]);
 
     useEffect(() => {
         if (!senderID) return;
 
-        // Connect to the CHAT endpoint (make sure port/path matches your backend)
         const socket = new WebSocket(`ws://localhost:8080/chat/${senderID}`);
         socketRef.current = socket;
 
         socket.onopen = () => console.log("Connected to Chat.");
 
-        // When we RECEIVE a message from someone else
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
@@ -35,31 +52,26 @@ function ChatBox() {
 
         return () => {
             if (socket.readyState === WebSocket.CONNECTING) {
-                // If it's still connecting, wait for it to open, then close it safely
                 socket.addEventListener('open', () => socket.close());
             } else {
-                // Otherwise, close it normally
                 socket.close();
             }
         };
     }, [senderID, addMessage]);
 
-    // Handle clicking the "Send" button
     const handleSend = (e) => {
         e.preventDefault();
         if (!inputText || !receiver) return;
 
-        // 1. Build the JSON object the Backend is expecting
         const messagePayload = {
-            receiver: receiver,
+            // FIX: Convert the receiver to a number so the Java backend doesn't crash
+            receiver: parseInt(receiver, 10),
             text: inputText
         };
 
-        // 2. Send it over the WebSocket to the backend
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify(messagePayload));
 
-            // 3. Add our own message to the screen locally so we can see what we typed
             addMessage({sender: senderID, text: inputText});
             setInputText('');
         }
@@ -67,7 +79,6 @@ function ChatBox() {
 
     return (
         <div className="chat-widget-container">
-            {/* 1. The floating button to open/close chat */}
             <button
                 className="chat-toggle-btn"
                 onClick={() => setIsOpen(!isOpen)}
@@ -75,7 +86,6 @@ function ChatBox() {
                 {isOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-chat-dots-fill"></i>}
             </button>
 
-            {/* 2. The actual chat window (only visible if isOpen is true) */}
             {isOpen && (
                 <div className="chat-window">
                     <div className="chat-header">
@@ -83,12 +93,19 @@ function ChatBox() {
                     </div>
 
                     <div className="chat-receiver-input">
-                        <input
-                            type="text"
+                        {/* FIX: Replaced input with select dropdown */}
+                        <select
                             value={receiver}
                             onChange={(e) => setReceiver(e.target.value)}
-                            placeholder="Who are you texting? (username)"
-                        />
+                            required
+                        >
+                            <option value="" disabled>Select user to message</option>
+                            {usersList.map(user => (
+                                <option key={user.id} value={user.id}>
+                                    {user.username}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="chat-history">

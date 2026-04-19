@@ -18,8 +18,10 @@ pt/uc/dei/proj5/dao/DefaultDao.class
 pt/uc/dei/proj5/beans/UserBean.class
 pt/uc/dei/proj5/entity/TokenEntity.class
 pt/uc/dei/proj5/service/LeadService.class
+pt/uc/dei/proj5/websockets/NotificationEndpoint.class
 pt/uc/dei/proj5/beans/TokenBean.class
 pt/uc/dei/proj5/entity/ClientEntity.class
 pt/uc/dei/proj5/service/UserService.class
 pt/uc/dei/proj5/dto/ClientDto.class
 pt/uc/dei/proj5/entity/UserEntity.class
+pt/uc/dei/proj5/websockets/ChatEndpoint.class

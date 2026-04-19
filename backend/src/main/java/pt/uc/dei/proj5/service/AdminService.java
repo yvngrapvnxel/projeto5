@@ -79,11 +79,11 @@ public class AdminService {
             return Response.status(400).entity("Invalid token.").build();
         }
 
-        UserDto admin = userBean.getTokensUser(token);
+        //UserDto admin = userBean.getTokensUser(token);
 
-        if (admin == null || !admin.isAdmin()) {
-            return Response.status(400).entity("User not authorized.").build();
-        }
+//        if (admin == null || !admin.isAdmin()) {
+//            return Response.status(400).entity("User not authorized.").build();
+//        }
 
         List<UserDto> users = adminBean.getAllUsers();
 

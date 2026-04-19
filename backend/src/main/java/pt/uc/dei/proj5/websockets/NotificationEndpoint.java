@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/notifications/{ID}")
 public class NotificationEndpoint {
 
-    private static UserBean userBean;
 
     // A thread-safe map to store active connections (Sessions) for each user
     private static final Map<Long, Session> activeSessions = new ConcurrentHashMap<>();
