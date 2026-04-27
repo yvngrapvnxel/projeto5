@@ -1,42 +1,58 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { API_URL } from "./config";
 import useUserStore from './stores/userStore';
 import useChatStore from './stores/chatStore';
+import { API_URL } from './config';
 import './Global.css';
 
 function ChatBox() {
     const [isOpen, setIsOpen] = useState(false);
     const senderID = useUserStore((state) => state.user.id);
-    const {messages, addMessage} = useChatStore();
+    const {messages, addMessage, setMessages} = useChatStore();
 
     const [receiver, setReceiver] = useState('');
     const [inputText, setInputText] = useState('');
-
-    // NEW: State to hold the list of users for the dropdown
     const [usersList, setUsersList] = useState([]);
 
     const socketRef = useRef(null);
 
-    const urlUsers = `${API_URL}/admin/users/all`;
-
+    // fetch users list
     useEffect(() => {
-        fetch(`${urlUsers}`, {
+        fetch(`${API_URL}/chat/users/${senderID}`, {
+            headers: { token: localStorage.getItem('token') }
+        })
+            .then(res => res.json())
+            .then(data => {
+                setUsersList(data);
+            })
+            .catch(err => console.error("Failed to load users", err));
+    }, [senderID]);
+
+    // fetch chat history when receiver changes
+    useEffect(() => {
+        if (!receiver || !senderID) return;
+
+        fetch(`${API_URL}/chat/history/${receiver}`, {
             headers: {
                 token: localStorage.getItem('token')
             }
         })
-            .then(res => res.json())
-            .then(data => {
-                const otherUsers = data.filter(u => u.id !== senderID);
-                setUsersList(otherUsers);
+            .then(res => {
+                if (res.ok) return res.json();
+                throw new Error("Failed to fetch history.");
             })
-            .catch(err => console.error("Failed to load users for chat", err));
-    }, [senderID, urlUsers]);
+            .then(data => {
+                // load DB history into store
+                setMessages(data);
+            })
+            .catch(err => console.error("Error loading chat history:", err));
+
+    }, [receiver, senderID, setMessages]);
 
     useEffect(() => {
         if (!senderID) return;
 
-        const socket = new WebSocket(`ws://localhost:8080/chat/${senderID}`);
+        const WS_BASE = API_URL.replace('http://', 'ws://').replace('https://', 'wss://').replace('/rest', '');
+        const socket = new WebSocket(`${WS_BASE}/chat/${senderID}`);
         socketRef.current = socket;
 
         socket.onopen = () => console.log("Connected to Chat.");
@@ -44,9 +60,14 @@ function ChatBox() {
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                addMessage(data);
+
+                addMessage({
+                    sender: data.sender,
+                    receiver: senderID,
+                    text: data.text
+                });
             } catch (error) {
-                console.error("Received non-JSON message from WebSocket: ", event.data);
+                console.error("Received non-JSON message: ", event.data);
             }
         };
 
@@ -63,26 +84,26 @@ function ChatBox() {
         e.preventDefault();
         if (!inputText || !receiver) return;
 
-        const messagePayload = {
-            // FIX: Convert the receiver to a number so the Java backend doesn't crash
-            receiver: parseInt(receiver, 10),
-            text: inputText
-        };
+        const receiverNum = parseInt(receiver, 10);
+        const messagePayload = { receiver: receiverNum, text: inputText };
 
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify(messagePayload));
 
-            addMessage({sender: senderID, text: inputText});
+            addMessage({ sender: senderID, receiver: receiverNum, text: inputText });
             setInputText('');
         }
     };
 
+
+    const activeConversation = messages.filter(msg =>
+        (msg.sender === senderID && msg.receiver === parseInt(receiver, 10)) ||
+        (msg.sender === parseInt(receiver, 10) && msg.receiver === senderID)
+    );
+
     return (
         <div className="chat-widget-container">
-            <button
-                className="chat-toggle-btn"
-                onClick={() => setIsOpen(!isOpen)}
-            >
+            <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
                 {isOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-chat-dots-fill"></i>}
             </button>
 
@@ -93,43 +114,46 @@ function ChatBox() {
                     </div>
 
                     <div className="chat-receiver-input">
-                        {/* FIX: Replaced input with select dropdown */}
                         <select
                             value={receiver}
                             onChange={(e) => setReceiver(e.target.value)}
-                            required
                         >
                             <option value="" disabled>Select user to message</option>
                             {usersList.map(user => (
-                                <option key={user.id} value={user.id}>
-                                    {user.username}
-                                </option>
+                                <option key={user.id} value={user.id}>{user.username}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="chat-history">
-                        {messages.length === 0 ? (
-                            <p className="no-messages">No messages yet.</p>
-                        ) : (
-                            messages?.map((msg, index) => (
-                                <div key={index} className={`chat-bubble ${msg.sender === senderID ? 'sent' : 'received'}`}>
-                                    <span className="sender-name">{msg.sender}</span>
-                                    <p>{msg.text}</p>
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    <form onSubmit={handleSend} className="chat-input-area">
-                        <input
-                            type="text"
-                            value={inputText}
-                            onChange={(e) => setInputText(e.target.value)}
-                            placeholder="Type a message..."
-                        />
-                        <button type="submit"><i className="bi bi-send-fill"></i></button>
-                    </form>
+                    {/* ONLY show chat history if a receiver is selected */}
+                    {receiver ? (
+                        <>
+                            <div className="chat-history">
+                                {activeConversation.length === 0 ? (
+                                    <p className="no-messages">No messages yet.</p>
+                                ) : (
+                                    activeConversation.map((msg, index) => (
+                                        <div key={index} className={`chat-bubble ${msg.sender === senderID ? 'sent' : 'received'}`}>
+                                            <p>{msg.text}</p>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <form onSubmit={handleSend} className="chat-input-area">
+                                <input
+                                    type="text"
+                                    value={inputText}
+                                    onChange={(e) => setInputText(e.target.value)}
+                                    placeholder="Type a message..."
+                                />
+                                <button type="submit"><i className="bi bi-send-fill"></i></button>
+                            </form>
+                        </>
+                    ) : (
+                        <div className="chat-placeholder">
+                            <p>Please select a user to start chatting.</p>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

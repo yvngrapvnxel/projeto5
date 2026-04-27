@@ -10,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-// named queries
 public class UserEntity implements Serializable {
 
 

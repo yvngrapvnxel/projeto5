@@ -4,6 +4,8 @@ import jakarta.persistence.NoResultException;
 import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Stateless
@@ -25,6 +27,19 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
         } catch (NoResultException e) {
             return null; // retorna null se não existir o conjunto username+password na DB ou se user estiver inativo
         }
+    }
+
+    public List<UserEntity> getAllUsers(Long userID) {
+
+        UserEntity user = em.find(UserEntity.class, userID);
+
+        if (user == null) {
+            return null;
+        }
+
+        return em.createQuery("SELECT u FROM UserEntity u WHERE u.id != :userID", UserEntity.class)
+                .setParameter("userID", userID)
+                .getResultList();
     }
 
 

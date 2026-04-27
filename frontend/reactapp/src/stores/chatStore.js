@@ -3,12 +3,15 @@ import { create } from 'zustand';
 const useChatStore = create((set) => ({
     messages: [],
 
-    // Add a new message to the chat history
+    // add new message to chat history
     addMessage: (msg) => set((state) => ({
         messages: [...state.messages, msg]
     })),
 
-    // Clear chat (useful when switching users)
+    // load full history from DB
+    setMessages: (history) => set({ messages: history }),
+
+    // clear chat
     clearMessages: () => set({ messages: [] })
 }));
 
