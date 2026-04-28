@@ -10,10 +10,9 @@ const useNotificationStore = create((set) => ({
         ] // novas primeiro
     })),
 
-    // Marks all notifications as read when the user opens the bell menu
-    /* markAllAsRead: () => set((state) => ({
+    markAllAsRead: () => set((state) => ({
         notifications: state.notifications.map(n => ({ ...n, read: true }))
-    })),*/
+    })),
 
     clearNotifications: () => set({ notifications: [] })
 }));

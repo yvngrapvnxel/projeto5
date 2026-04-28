@@ -38,15 +38,27 @@ const Navbar = () => {
         useClientStore.setState({clients: []});
         useLeadStore.setState({leads: []});
         useAdminStore.setState({users: [], selectedUserClients: [], selectedUserLeads: []});
+        useNotificationStore.setState({notifications: []}); // Good practice to clear notifs on logout too
         navigate('/login');
     };
 
     const [showDropdown, setShowDropdown] = useState(false);
-    const {notifications} = useNotificationStore();
+
+    // 1. Destructure markAllAsRead from your store
+    const {notifications, markAllAsRead} = useNotificationStore();
+
+    // 2. Count unread notifications for the badge
     const unreadCount = notifications.filter(n => !n.read).length;
 
+    // 3. Handle clicking the bell
     const handleBellClick = () => {
-        setShowDropdown(!showDropdown);
+        const willOpen = !showDropdown;
+        setShowDropdown(willOpen);
+
+        // REQUISITO: Notificações marcadas como lidas ao abrir lista
+        if (willOpen && unreadCount > 0) {
+            markAllAsRead();
+        }
     };
 
     return (
@@ -121,25 +133,55 @@ const Navbar = () => {
                 </div>
 
                 {!isLoginRegisterPage && (
-                    <div className="notification-wrapper">
-                        <button onClick={handleBellClick} className="bell-btn">
-                            <i className="bi bi-bell-fill"></i>
+                    <div className="notification-wrapper" style={{ position: 'relative' }}>
+                        <button onClick={handleBellClick} className="bell-btn" style={{ position: 'relative', border: 'none', background: 'none' }}>
+                            <i className="bi bi-bell-fill" style={{ fontSize: '1.5rem' }}></i>
+                            {/* REQUISITO: Contador sempre visível */}
                             {unreadCount > 0 && (
-                                <span className="notification-badge">{unreadCount}</span>
+                                <span className="notification-badge" style={{
+                                    position: 'absolute',
+                                    top: '-5px',
+                                    right: '-5px',
+                                    backgroundColor: 'red',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                    padding: '2px 6px',
+                                    fontSize: '10px',
+                                    fontWeight: 'bold'
+                                }}>
+                                    {unreadCount}
+                                </span>
                             )}
                         </button>
 
                         {showDropdown && (
-                            <div className="notification-dropdown">
-                                <div className="dropdown-header">
-                                    <h4>Notifications</h4>
+                            <div className="notification-dropdown" style={{
+                                position: 'absolute',
+                                right: 0,
+                                top: '100%',
+                                backgroundColor: 'white',
+                                border: '1px solid #ccc',
+                                borderRadius: '5px',
+                                width: '300px',
+                                maxHeight: '400px',
+                                overflowY: 'auto',
+                                zIndex: 1000,
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                            }}>
+                                <div className="dropdown-header" style={{ padding: '10px', borderBottom: '1px solid #eee', backgroundColor: '#f8f9fa' }}>
+                                    <h5 style={{ margin: 0 }}>Notifications</h5>
                                 </div>
                                 <div className="dropdown-body">
                                     {notifications.length === 0 ? (
-                                        <p className="no-notifs">No new notifications</p>
+                                        <p className="no-notifs" style={{ padding: '15px', margin: 0, textAlign: 'center', color: '#666' }}>No new notifications</p>
                                     ) : (
                                         notifications.map((notif) => (
-                                            <div key={notif.id} className="notification-item">
+                                            <div key={notif.id} className="notification-item" style={{
+                                                padding: '12px 15px',
+                                                borderBottom: '1px solid #eee',
+                                                fontSize: '0.9rem',
+                                                color: '#333'
+                                            }}>
                                                 {notif.message}
                                             </div>
                                         ))
@@ -187,6 +229,11 @@ const Navbar = () => {
                                         cursor: 'pointer',
                                         objectFit: 'cover'
                                     }}
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "/default-user.png";
+                                    }}
                                 />
                             </Link>
 
@@ -200,6 +247,5 @@ const Navbar = () => {
         </>
     );
 };
-
 
 export default Navbar;
