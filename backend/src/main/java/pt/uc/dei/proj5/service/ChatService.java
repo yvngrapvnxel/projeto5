@@ -79,11 +79,22 @@ public class ChatService {
             chatHistory.add(new MessageDto(
                     m.getSender().getId(),
                     m.getReceiver().getId(),
-                    m.getText()
+                    m.getText(),
+                    m.getTimestamp() != null ? m.getTimestamp().toString() : null,
+                    m.isRead()
             ));
         }
 
-
         return Response.status(200).entity(chatHistory).build();
+    }
+
+    @PUT
+    @Path("/read/{theirId}")
+    public Response markAsRead(@PathParam("theirId") Long theirId, @HeaderParam("token") String token) {
+        Long myId = tokenDao.getTokensUser(token).getId();
+
+        int updatedCount = messageDao.markMessagesAsRead(myId, theirId);
+
+        return Response.ok().entity("{\"updated\": " + updatedCount + "}").build();
     }
 }

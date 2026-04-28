@@ -11,13 +11,17 @@ public class MessageDto implements Serializable {
     private Long sender;
     private Long receiver;
     private String text;
+    private String timestamp;
+    private boolean isRead;
 
     public MessageDto() {}
 
-    public MessageDto(Long sender, Long receiver, String text) {
+    public MessageDto(Long sender, Long receiver, String text, String timestamp, boolean isRead) {
         this.sender = sender;
         this.receiver = receiver;
         this.text = text;
+        this.timestamp = timestamp;
+        this.isRead = isRead;
     }
 
     @XmlElement
@@ -34,4 +38,14 @@ public class MessageDto implements Serializable {
     public String getText() { return text; }
 
     public void setText(String text) { this.text = text; }
+
+    @XmlElement
+    public String getTimestamp() { return timestamp; }
+
+    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
+
+    @XmlElement
+    public boolean isRead() { return isRead; }
+
+    public void setRead(boolean read) { this.isRead = read; }
 }

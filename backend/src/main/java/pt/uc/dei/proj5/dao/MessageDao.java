@@ -1,6 +1,7 @@
 package pt.uc.dei.proj5.dao;
 
 import jakarta.ejb.Stateless;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import pt.uc.dei.proj5.entity.MessageEntity;
 import java.io.Serializable;
@@ -18,6 +19,19 @@ public class MessageDao extends DefaultDao<MessageEntity> implements Serializabl
 
     public void saveMessage(MessageEntity message) {
         persist(message);
+    }
+
+    public int markMessagesAsRead(Long myId, Long theirId) {
+        String jpql = "UPDATE MessageEntity m " +
+                "SET m.isRead = true " +
+                "WHERE m.receiver.id = :myId AND m.sender.id = :theirId AND m.isRead = false";
+
+        Query query = em.createQuery(jpql);
+
+        query.setParameter("myId", myId);
+        query.setParameter("theirId", theirId);
+
+        return query.executeUpdate();
     }
 
 

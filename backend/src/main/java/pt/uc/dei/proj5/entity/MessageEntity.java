@@ -39,6 +39,9 @@ public class MessageEntity implements Serializable {
     @Column(name = "sent_at", nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead = false;
+
     @PrePersist
     protected void onCreate() {
         this.timestamp = LocalDateTime.now();
@@ -65,6 +68,7 @@ public class MessageEntity implements Serializable {
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
+    public  boolean isRead() { return isRead; }
 
     // setters
 
@@ -76,5 +80,8 @@ public class MessageEntity implements Serializable {
     }
     public void setText(String text) {
         this.text = text;
+    }
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
     }
 }
