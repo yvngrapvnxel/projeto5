@@ -3,6 +3,7 @@ package pt.uc.dei.proj5.dao;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import pt.uc.dei.proj5.entity.MessageEntity;
 import java.io.Serializable;
 import java.util.List;
@@ -21,6 +22,7 @@ public class MessageDao extends DefaultDao<MessageEntity> implements Serializabl
         persist(message);
     }
 
+    @Transactional
     public int markMessagesAsRead(Long myId, Long theirId) {
         String jpql = "UPDATE MessageEntity m " +
                 "SET m.isRead = true " +

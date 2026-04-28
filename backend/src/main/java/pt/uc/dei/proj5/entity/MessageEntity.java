@@ -42,12 +42,14 @@ public class MessageEntity implements Serializable {
     @Column(name = "isRead", nullable = false)
     private boolean isRead = false;
 
+
     @PrePersist
     protected void onCreate() {
-        this.timestamp = LocalDateTime.now();
+        if (this.timestamp == null) {
+            this.timestamp = LocalDateTime.now();
+        }
+        this.isRead = false;
     }
-
-
 
     // --- MÉTODOS
 

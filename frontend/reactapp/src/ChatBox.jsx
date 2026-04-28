@@ -62,6 +62,7 @@ function ChatBox() {
                 throw new Error("Failed to fetch history.");
             })
             .then(data => {
+                console.log("CHAT HISTORY FROM BACKEND:", data);
                 setMessages(data);
             })
             .catch(err => console.error("Error loading chat history:", err));
@@ -85,7 +86,8 @@ function ChatBox() {
                     sender: data.sender,
                     receiver: senderID,
                     text: data.text,
-                    timestamp: data.timestamp || new Date().toISOString()
+                    timestamp: data.timestamp || new Date().toISOString(),
+                    isRead: false
                 });
             } catch (error) {
                 console.error("Received non-JSON message: ", event.data);

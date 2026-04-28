@@ -90,11 +90,20 @@ public class ChatService {
 
     @PUT
     @Path("/read/{theirId}")
-    public Response markAsRead(@PathParam("theirId") Long theirId, @HeaderParam("token") String token) {
-        Long myId = tokenDao.getTokensUser(token).getId();
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response markAsRead(@PathParam("theirId") Long theirId,
+                               @HeaderParam("token") String token) {
+        try {
+            UserEntity me = tokenDao.getTokensUser(token);
+            if (me == null) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
 
-        int updatedCount = messageDao.markMessagesAsRead(myId, theirId);
+            int updatedCount = messageDao.markMessagesAsRead(me.getId(), theirId);
 
-        return Response.ok().entity("{\"updated\": " + updatedCount + "}").build();
+            return Response.ok("{\"updated\": " + updatedCount + "}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error marking as read").build();
+        }
     }
 }
