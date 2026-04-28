@@ -3,16 +3,20 @@ import { create } from 'zustand';
 const useChatStore = create((set) => ({
     messages: [],
 
-    // add new message to chat history
     addMessage: (msg) => set((state) => ({
         messages: [...state.messages, msg]
     })),
 
-    // load full history from DB
     setMessages: (history) => set({ messages: history }),
 
-    // clear chat
-    clearMessages: () => set({ messages: [] })
+    clearMessages: () => set({ messages: [] }),
+
+    // NEW: Function to mark messages as read in the UI
+    markMessagesAsReadByReceiver: (readerId) => set((state) => ({
+        messages: state.messages.map(msg =>
+            msg.receiver === readerId ? { ...msg, isRead: true } : msg
+        )
+    }))
 }));
 
 export default useChatStore;

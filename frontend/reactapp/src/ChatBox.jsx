@@ -12,7 +12,7 @@ function ChatBox() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const senderID = useUserStore((state) => state.user.id);
-    const {messages, addMessage, setMessages} = useChatStore();
+    const { messages, addMessage, setMessages, markMessagesAsReadByReceiver } = useChatStore();
 
     const [receiver, setReceiver] = useState(null); // Now stores the entire user object {id, username}
     const [inputText, setInputText] = useState('');
@@ -82,36 +82,64 @@ function ChatBox() {
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                addMessage({
-                    sender: data.sender,
-                    receiver: senderID,
-                    text: data.text,
-                    timestamp: data.timestamp || new Date().toISOString(),
-                    isRead: false
-                });
+                console.log("WebSocket received:", data);
+
+                if (data.type === 'READ') {
+                    useChatStore.getState().markMessagesAsReadByReceiver(data.readerId);
+                } else {
+                    useChatStore.getState().addMessage({
+                        sender: data.sender,
+                        receiver: senderID,
+                        text: data.text,
+                        timestamp: data.timestamp || new Date().toISOString(),
+                        isRead: false
+                    });
+                }
             } catch (error) {
                 console.error("Received non-JSON message: ", event.data);
             }
         };
 
         return () => {
-            if (socket.readyState === WebSocket.CONNECTING) {
-                socket.addEventListener('open', () => socket.close());
-            } else {
+            if (socket.readyState === 1 || socket.readyState === 0) {
                 socket.close();
             }
         };
-    }, [senderID, addMessage]);
+    }, [senderID]);
 
     useEffect(() => {
         if (receiver && senderID) {
-            // Tell backend to mark unread messages from this receiver as read
             fetch(`${API_URL}/chat/read/${receiver.id}`, {
                 method: 'PUT',
                 headers: { token: localStorage.getItem('token') }
             }).catch(err => console.error("Failed to mark messages as read", err));
+
+            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                const readPayload = { type: "READ", receiver: receiver.id };
+                console.log("Sending READ via WebSocket:", readPayload);
+                socketRef.current.send(JSON.stringify(readPayload));
+            } else {
+                console.warn("WebSocket not open yet, skipped sending real-time read receipt.");
+            }
         }
     }, [receiver, senderID]);
+
+    useEffect(() => {
+        if (receiver && senderID && messages.length > 0) {
+            const lastMsg = messages[messages.length - 1];
+
+            // If the last message is from the person we are currently chatting with, and it's unread
+            if (lastMsg.sender === receiver.id && !lastMsg.read) {
+                // Instantly notify them we read it
+                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                    socketRef.current.send(JSON.stringify({
+                        type: "READ",
+                        receiver: receiver.id
+                    }));
+                }
+            }
+        }
+    }, [messages, receiver, senderID]);
 
     // Send a message
     const handleSend = (e) => {
@@ -234,11 +262,11 @@ function ChatBox() {
                                                 <span className="chat-timestamp">{formatTimestamp(msg.timestamp)}</span>
 
                                                 {msg.sender === senderID && (
-                                                    <span className={`chat-read-status ${msg.isRead ? 'read' : 'sent'}`}>
-                                                        {msg.isRead ? (
-                                                            <i className="bi bi-check-all"></i> /* Double tick for read */
+                                                    <span className={`chat-read-status ${msg.read ? 'read' : 'sent'}`}>
+                                                        {msg.read ? (
+                                                            <i className="bi bi-check-all"></i>
                                                         ) : (
-                                                            <i className="bi bi-check"></i> /* Single tick for sent */
+                                                            <i className="bi bi-check"></i>
                                                         )}
                                                     </span>
                                                 )}
