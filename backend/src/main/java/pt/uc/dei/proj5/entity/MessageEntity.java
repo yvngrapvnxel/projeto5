@@ -39,7 +39,7 @@ public class MessageEntity implements Serializable {
     @Column(name = "sent_at", nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
-    @Column(name = "is_read", nullable = false)
+    @Column(name = "isRead", nullable = false)
     private boolean isRead = false;
 
     @PrePersist
