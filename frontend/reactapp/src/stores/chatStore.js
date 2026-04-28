@@ -11,10 +11,17 @@ const useChatStore = create((set) => ({
 
     clearMessages: () => set({ messages: [] }),
 
-    // NEW: Function to mark messages as read in the UI
+    // When the OTHER person reads YOUR messages (updates your checkmarks)
     markMessagesAsReadByReceiver: (readerId) => set((state) => ({
         messages: state.messages.map(msg =>
-            msg.receiver === readerId ? { ...msg, isRead: true } : msg
+            msg.receiver == readerId ? { ...msg, isRead: true } : msg
+        )
+    })),
+
+    // When YOU read the OTHER person's messages while the chat is open
+    markMessagesAsReadByMe: (senderId) => set((state) => ({
+        messages: state.messages.map(msg =>
+            msg.sender == senderId ? { ...msg, isRead: true } : msg
         )
     }))
 }));

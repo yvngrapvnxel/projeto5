@@ -125,6 +125,46 @@ function ChatBox() {
     }, [receiver, senderID]);
 
     useEffect(() => {
+        if (!receiver || !senderID) return;
+
+        // Tell DB we read their past messages
+        fetch(`${API_URL}/chat/read/${receiver.id}`, {
+            method: 'PUT',
+            headers: { token: localStorage.getItem('token') }
+        }).catch(err => console.error("Failed to update DB read status", err));
+
+        // Tell WebSocket we read their past messages
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({ type: "READ", receiver: receiver.id }));
+        }
+    }, [receiver, senderID]); // Only runs when you click a user from the list
+
+    // 3. INSTANT AUTO-READ WHEN CHAT IS ALREADY OPEN
+    useEffect(() => {
+        if (!receiver || !senderID || messages.length === 0) return;
+
+        const lastMsg = messages[messages.length - 1];
+
+        // If a new message pops up from the person we are CURRENTLY staring at, and it's unread
+        if (lastMsg.sender === receiver.id && !lastMsg.isRead) {
+
+            // Mark it locally immediately to prevent infinite loops
+            useChatStore.getState().markMessagesAsReadByMe(receiver.id);
+
+            // Send WS receipt so THEIR screen instantly updates to double-blue checkmarks
+            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                socketRef.current.send(JSON.stringify({ type: "READ", receiver: receiver.id }));
+            }
+
+            // Update DB for this new message
+            fetch(`${API_URL}/chat/read/${receiver.id}`, {
+                method: 'PUT',
+                headers: { token: localStorage.getItem('token') }
+            });
+        }
+    }, [messages, receiver, senderID]); // Runs whenever the messages array updates
+
+    useEffect(() => {
         if (receiver && senderID && messages.length > 0) {
             const lastMsg = messages[messages.length - 1];
 
@@ -192,7 +232,7 @@ function ChatBox() {
                         <>
                             {/* --- LIST VIEW --- */}
                             <div className="chat-header">
-                                <h4>Conversations</h4>
+                                <h4>Chats</h4>
                             </div>
 
                             <div className="chat-search">
@@ -213,9 +253,11 @@ function ChatBox() {
                                         <div key={user.id} className="chat-user-item" onClick={() => openChat(user)}>
                                             <div className="chat-user-avatar">
                                                 <img
-                                                    src={user.photo}
+                                                    src={user.photoUrl ? user.photoUrl : "/default-user.png"}
                                                     alt={`${user.username}`}
                                                     className="chat-avatar-img"
+                                                    referrerPolicy="no-referrer"
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "/default-user.png"; }}
                                                 />
                                             </div>
                                             <div className="chat-user-info">
@@ -239,9 +281,10 @@ function ChatBox() {
                                 <div className="chat-header-user">
                                     <div className="chat-header-avatar-small">
                                         <img
-                                            src={receiver.photo ? receiver.photo : "/default-user.png"}
+                                            src={receiver.photoUrl ? receiver.photoUrl : "/default-user.png"}
                                             alt={`${receiver.username}`}
                                             className="chat-avatar-img"
+                                            referrerPolicy="no-referrer"
                                         />
                                     </div>
                                     <h4>{receiver.username}</h4>
