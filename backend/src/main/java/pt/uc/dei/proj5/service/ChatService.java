@@ -5,6 +5,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pt.uc.dei.proj5.beans.UserBean;
+import pt.uc.dei.proj5.dao.AdminDao;
 import pt.uc.dei.proj5.dao.MessageDao;
 import pt.uc.dei.proj5.dao.TokenDao;
 import pt.uc.dei.proj5.dao.UserDao;
@@ -12,6 +13,7 @@ import pt.uc.dei.proj5.dto.MessageDto;
 import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.MessageEntity;
 import pt.uc.dei.proj5.entity.UserEntity;
+import pt.uc.dei.proj5.websockets.ChatEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,9 @@ public class ChatService {
 
     @Inject
     private TokenDao tokenDao;
+
+    @Inject
+    private AdminDao adminDao;
 
 
     @GET
@@ -104,6 +109,51 @@ public class ChatService {
             return Response.ok("{\"updated\": " + updatedCount + "}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error marking as read").build();
+        }
+    }
+
+    @POST
+    @Path("/send")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sendMessage(MessageDto messageDto, @HeaderParam("token") String token) {
+        try {
+            // 1. Authenticate sender using the token
+            UserEntity sender = tokenDao.getTokensUser(token);
+            if (sender == null) {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token.").build();
+            }
+
+            // 2. Fetch the receiver entity
+            // (Assuming userDao has a method like this. If not, use adminDao.getUserByID)
+
+            UserEntity receiver = adminDao.getUserByID(messageDto.getReceiver());
+            if (receiver == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Receiver not found.").build();
+            }
+
+            // 3. Create and save the message to the database
+            MessageEntity newMsg = new MessageEntity();
+            newMsg.setSender(sender);
+            newMsg.setReceiver(receiver);
+            newMsg.setText(messageDto.getText());
+            newMsg.setRead(false);
+
+            messageDao.saveMessage(newMsg);
+
+            // 4. Send the real-time WebSocket update to the receiver
+            ChatEndpoint.sendRealTimeMessage(sender.getId(), receiver.getId(), messageDto.getText());
+
+            // 5. Send Notification to the bell icon
+            String notificationMsg = "New message from " + sender.getUsername() + ": " + messageDto.getText();
+            pt.uc.dei.proj5.websockets.NotificationEndpoint.sendNotification(receiver.getId(), notificationMsg);
+
+            return Response.status(Response.Status.OK).entity("Message sent successfully.").build();
+
+        } catch (Exception e) {
+            System.err.println("REST Error sending message: " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to send message.").build();
         }
     }
 }

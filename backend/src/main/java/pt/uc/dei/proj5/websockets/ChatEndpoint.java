@@ -147,4 +147,25 @@ public class ChatEndpoint {
             e.printStackTrace();
         }
     }
+
+    // NEW: Helper method so the REST API can trigger a WebSocket push
+    public static void sendRealTimeMessage(Long senderId, Long receiverId, String text) {
+        Session receiverSession = chatSessions.get(receiverId);
+
+        if (receiverSession != null && receiverSession.isOpen()) {
+            try {
+                JsonObject outgoingJson = Json.createObjectBuilder()
+                        .add("type", "MESSAGE")
+                        .add("sender", senderId)
+                        .add("receiver", receiverId)
+                        .add("text", text)
+                        .build();
+
+                receiverSession.getBasicRemote().sendText(outgoingJson.toString());
+                System.out.println("REST explicitly pushed message to WS session: " + receiverId);
+            } catch (Exception e) {
+                System.err.println("Failed to push real-time message from REST: " + e.getMessage());
+            }
+        }
+    }
 }

@@ -186,16 +186,26 @@ function ChatBox() {
         e.preventDefault();
         if (!inputText.trim() || !receiver) return;
 
-        const currentTimestamp = new Date().toISOString();
+        const messagePayload = { receiver: receiver.id, text: inputText };
 
-        const messagePayload = {receiver: receiver.id, text: inputText, timestamp: currentTimestamp};
-
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            socketRef.current.send(JSON.stringify(messagePayload));
-
-            addMessage({sender: senderID, receiver: receiver.id, text: inputText, timestamp: currentTimestamp});
+        // Send via REST POST as required
+        fetch(`${API_URL}/chat/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': localStorage.getItem('token')
+            },
+            body: JSON.stringify(messagePayload)
+        }).then(() => {
+            // Optimistically add to your local UI
+            addMessage({
+                sender: senderID,
+                receiver: receiver.id,
+                text: inputText,
+                timestamp: new Date().toISOString()
+            });
             setInputText('');
-        }
+        });
     };
 
     // Navigation handlers
