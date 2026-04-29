@@ -14,6 +14,7 @@ import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.MessageEntity;
 import pt.uc.dei.proj5.entity.UserEntity;
 import pt.uc.dei.proj5.websockets.ChatEndpoint;
+import pt.uc.dei.proj5.websockets.NotificationEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +117,8 @@ public class ChatService {
     @Path("/send")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response sendMessage(MessageDto messageDto, @HeaderParam("token") String token) {
+    public Response sendMessage(MessageDto messageDto,
+                                @HeaderParam("token") String token) {
         try {
             // 1. Authenticate sender using the token
             UserEntity sender = tokenDao.getTokensUser(token);
@@ -141,12 +143,14 @@ public class ChatService {
 
             messageDao.saveMessage(newMsg);
 
+
             // 4. Send the real-time WebSocket update to the receiver
             ChatEndpoint.sendRealTimeMessage(sender.getId(), receiver.getId(), messageDto.getText());
 
+
             // 5. Send Notification to the bell icon
             String notificationMsg = "New message from " + sender.getUsername() + ": " + messageDto.getText();
-            pt.uc.dei.proj5.websockets.NotificationEndpoint.sendNotification(receiver.getId(), notificationMsg);
+            NotificationEndpoint.sendNotification(receiver.getId(), notificationMsg);
 
             return Response.status(Response.Status.OK).entity("Message sent successfully.").build();
 

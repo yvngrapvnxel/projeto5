@@ -60,7 +60,8 @@ public class ChatEndpoint {
             JsonObject incomingJson = reader.readObject();
 
             // 1. SAFELY extract 'type'
-            String type = "MESSAGE"; // default
+            String type = null;
+
             if (incomingJson.containsKey("type") && !incomingJson.isNull("type")) {
                 type = incomingJson.getString("type");
             }
@@ -132,6 +133,7 @@ public class ChatEndpoint {
                             .add("receiver", receiverID)
                             .add("text", text)
                             .build();
+
 
                     receiverSession.getBasicRemote().sendText(outgoingJson.toString());
                 }

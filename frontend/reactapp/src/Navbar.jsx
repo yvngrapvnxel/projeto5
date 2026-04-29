@@ -87,7 +87,7 @@ const Navbar = () => {
                             <li><Link to="/leads" onClick={toggleSidebar} className="sidebar-link">Sales Leads</Link>
                             </li>
                             {user.admin && (<Link to="/admin" onClick={toggleSidebar} className="sidebar-link"> <i
-                                class="fa-solid fa-crown"></i> Administration</Link>)}
+                                className="fa-solid fa-crown"></i> Administration</Link>)}
                         </ul>
                     </div>
                 </aside>

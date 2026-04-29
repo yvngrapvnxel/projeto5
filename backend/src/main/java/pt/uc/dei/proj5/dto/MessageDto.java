@@ -13,6 +13,7 @@ public class MessageDto implements Serializable {
     private String text;
     private String timestamp;
     private boolean isRead;
+    private String type;
 
     public MessageDto() {}
 
@@ -48,4 +49,9 @@ public class MessageDto implements Serializable {
     public boolean isRead() { return isRead; }
 
     public void setRead(boolean read) { this.isRead = read; }
+
+    @XmlElement
+    public String getType() { return type; }
+
+    public void setType(String type) { this.type = type; }
 }
