@@ -17,6 +17,7 @@ import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 
 import java.util.List;
+import java.util.Map;
 
 @Path("/admin")
 public class AdminService {
@@ -41,6 +42,36 @@ public class AdminService {
 
     @Inject
     LeadBean leadBean;
+
+
+    // --- INVITE USERS
+
+    @POST
+    @Path("/users/invite")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response inviteUser(@HeaderParam("token") String token, Map<String, String> payload) {
+
+        if (tokenBean.invalidToken(token)) {
+            return Response.status(401).entity("Invalid token.").build();
+        }
+
+        UserDto admin = userBean.getTokensUser(token);
+        if (admin == null || !admin.isAdmin()) {
+            return Response.status(403).entity("Unauthorized.").build();
+        }
+
+        String email = payload.get("email");
+        if (email == null || email.isEmpty()) {
+            return Response.status(400).entity("Email is required.").build();
+        }
+
+        // Create inactive user and generate 12-hour token
+        String inviteToken = adminBean.createInvitation(email);
+
+        // TODO Logic to send email via MailHog
+
+        return Response.ok("Invitation sent to " + email).build();
+    }
 
 
     // --- GET 1 USER

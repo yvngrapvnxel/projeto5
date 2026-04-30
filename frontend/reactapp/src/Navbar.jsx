@@ -18,7 +18,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const isLoginRegisterPage = location.pathname === '/login' || location.pathname === '/register';
+    const isLoginRegisterPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password';
 
     const handleLogout = async () => {
         const token = localStorage.getItem('token');

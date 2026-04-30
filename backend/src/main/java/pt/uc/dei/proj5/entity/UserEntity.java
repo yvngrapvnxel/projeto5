@@ -49,7 +49,7 @@ public class UserEntity implements Serializable {
     private boolean isAdmin;
 
     @Column(name = "isActive", nullable = false)
-    private boolean isActive;
+    private boolean isActive = false;
     
     @Column(name = "lang", nullable = false)
     private String lang;

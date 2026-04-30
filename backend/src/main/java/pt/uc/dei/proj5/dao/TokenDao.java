@@ -35,7 +35,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
     }
 
 
-    public void guardarTokenDB(String token, UserEntity u) {
+    public void guardarTokenDB(String token, UserEntity u, int hours) {
 
         String encriptado = encriptar(token);
 
@@ -43,8 +43,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
         tokenEntity.setToken(encriptado);
         tokenEntity.setUserId(u);
         tokenEntity.setSessionDate(LocalDateTime.now());
-        tokenEntity.setExpireTime(LocalDateTime.now().plusHours(1)); // expira em 1h
-
+        tokenEntity.setExpireTime(LocalDateTime.now().plusHours(hours)); // Configurable hours
         persist(tokenEntity);
     }
 
@@ -80,9 +79,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
 
 
     public void setExpired(String token) {
-
         String encriptado = encriptar(token);
-
         em.createQuery("UPDATE TokenEntity t SET t.expireTime = CURRENT_TIMESTAMP WHERE t.token = :token")
                 .setParameter("token", encriptado)
                 .executeUpdate();

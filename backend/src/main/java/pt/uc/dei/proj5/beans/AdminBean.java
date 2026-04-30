@@ -2,9 +2,7 @@ package pt.uc.dei.proj5.beans;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import pt.uc.dei.proj5.dao.AdminDao;
-import pt.uc.dei.proj5.dao.ClientDao;
-import pt.uc.dei.proj5.dao.LeadDao;
+import pt.uc.dei.proj5.dao.*;
 import pt.uc.dei.proj5.entity.ClientEntity;
 import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.LeadEntity;
@@ -28,6 +26,15 @@ public class AdminBean implements Serializable {
     @Inject
     LeadDao leadDao;
 
+    @Inject
+    TokenBean tokenBean;
+
+    @Inject
+    TokenDao tokenDao;
+
+    @Inject
+    UserDao userDao;
+
 
     // --- GET 1 USER
 
@@ -48,6 +55,33 @@ public class AdminBean implements Serializable {
             dtos.add(userBean.fromEntityToDto(u));
         }
         return dtos;
+    }
+
+
+    // --- INVITE USER
+
+    public String createInvitation(String email) {
+
+        if (userDao.usernameAlreadyExists(email)) return null;
+
+        UserEntity newUser = new UserEntity();
+        newUser.setEmail(email);
+        newUser.setUsername(email);
+        newUser.setIsActive(false);
+        newUser.setLang("en");
+        newUser.setPassword("");
+        newUser.setFirstName("");
+        newUser.setLastName("");
+        newUser.setPhone("");
+        newUser.setPhotoUrl("");
+        // Password and other details are left null/empty until the user registers
+
+        adminDao.persist(newUser);
+
+        String rawToken = tokenBean.generateToken();
+        tokenDao.guardarTokenDB(rawToken, newUser, 12);
+
+        return rawToken;
     }
 
 

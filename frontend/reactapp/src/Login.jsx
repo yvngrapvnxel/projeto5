@@ -117,7 +117,7 @@ const LoginPage = () => {
 
 
                         <div className="text-center mt-3">
-                            <br></br><p>Don't have an account? <Link to="/register" className="fw-bold">Register here</Link></p>
+                            <Link to="/forgot-password">Forgot password?</Link>
                         </div>
 
                     </form>

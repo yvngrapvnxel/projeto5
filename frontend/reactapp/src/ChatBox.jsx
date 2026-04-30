@@ -98,7 +98,7 @@ function ChatBox() {
         }
     }, [receiver, senderID, setMessages]);
 
-    // 4. Auto-Read New Incoming Messages[cite: 2] // TODO EM VEZ DE ENVIAR TODAS ENVIAR APENAS A PRIMEIRA
+    // 4. Auto-Read New Incoming Messages // TODO EM VEZ DE ENVIAR TODAS ENVIAR APENAS A PRIMEIRA
     useEffect(() => {
         if (!receiver || !senderID || messages.length === 0) return;
 

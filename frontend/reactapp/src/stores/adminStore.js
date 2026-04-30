@@ -14,6 +14,7 @@ const useAdminStore = create((set, get) => ({
 
 
     // --- USERS
+
     fetchUsers: async () => {
         set({ loading: true });
         const response = await fetch(`${admin_URL}/users/all`, {
@@ -28,6 +29,24 @@ const useAdminStore = create((set, get) => ({
             await handleAuthError(response);
         }
         set({ loading: false });
+    },
+
+    inviteUser: async (email) => {
+        const response = await fetch(`${admin_URL}/users/invite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            await handleAuthError(response);
+            return false;
+        }
     },
 
     deleteUser: async (userId, permanent = false) => {

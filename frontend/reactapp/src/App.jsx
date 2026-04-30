@@ -9,6 +9,7 @@ import ClientsPage from './Clients';
 import LeadsPage from './Leads';
 import ProfilePage from './UserProfile';
 import AdminPage from './AdminPage';
+import {ForgotPassword} from './ForgotPassword';
 import useUserStore from "./stores/userStore";
 import useNotificationStore from './stores/notifStore';
 import './Global.css';
@@ -126,6 +127,8 @@ function GlobalApp() {
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/clients" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />

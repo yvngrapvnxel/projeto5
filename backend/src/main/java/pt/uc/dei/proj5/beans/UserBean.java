@@ -23,7 +23,6 @@ public class UserBean implements Serializable {
 
 
     // --- LOGIN
-
     public String authenticate(String username, String password) {
         // retorna a Entity correspondente ao username+password ou null em caso contrário
         UserEntity u = userDao.verifyLogin(username, password);
@@ -35,7 +34,7 @@ public class UserBean implements Serializable {
 
         // gera e guarda o token
         String token = tokenBean.generateToken();
-        tokenDao.guardarTokenDB(token, u);
+        tokenDao.guardarTokenDB(token, u, 1);
 
         // retorna o token
         return token;
