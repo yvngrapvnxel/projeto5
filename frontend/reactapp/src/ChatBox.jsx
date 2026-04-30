@@ -16,6 +16,8 @@ function ChatBox() {
     const { messages, addMessage, setMessages } = useChatStore();
     const socketRef = useRef(null);
 
+    const lastProcessedMessageRef = useRef(null);
+
     const formatTimestamp = (isoString) => {
         if (!isoString) return '';
         const date = new Date(isoString);
@@ -96,12 +98,19 @@ function ChatBox() {
         }
     }, [receiver, senderID, setMessages]);
 
-    // 4. Auto-Read New Incoming Messages[cite: 2]
+    // 4. Auto-Read New Incoming Messages[cite: 2] // TODO EM VEZ DE ENVIAR TODAS ENVIAR APENAS A PRIMEIRA
     useEffect(() => {
         if (!receiver || !senderID || messages.length === 0) return;
 
         const lastMsg = messages[messages.length - 1];
+
+        // NEW: If we already processed this exact message timestamp/ID, skip it!
+        if (lastProcessedMessageRef.current === lastMsg.timestamp) return;
+
         if (lastMsg.sender === receiver.id && !lastMsg.read) {
+            // NEW: Instantly mark this message as processed to break the loop
+            lastProcessedMessageRef.current = lastMsg.timestamp;
+
             // Mark locally
             useChatStore.getState().markMessagesAsReadByMe(receiver.id);
 
@@ -114,7 +123,7 @@ function ChatBox() {
             fetch(`${API_URL}/chat/read/${receiver.id}`, {
                 method: 'PUT',
                 headers: { token: localStorage.getItem('token') }
-            });
+            }).catch(err => console.error("Failed to sync read status", err));
         }
     }, [messages, receiver, senderID]);
 

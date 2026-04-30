@@ -1,6 +1,9 @@
 package pt.uc.dei.proj5.service;
 
 import jakarta.inject.Inject;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -119,6 +122,7 @@ public class ChatService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response sendMessage(MessageDto messageDto,
                                 @HeaderParam("token") String token) {
+
         try {
             // 1. Authenticate sender using the token
             UserEntity sender = tokenDao.getTokensUser(token);
@@ -127,8 +131,6 @@ public class ChatService {
             }
 
             // 2. Fetch the receiver entity
-            // (Assuming userDao has a method like this. If not, use adminDao.getUserByID)
-
             UserEntity receiver = adminDao.getUserByID(messageDto.getReceiver());
             if (receiver == null) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Receiver not found.").build();
@@ -159,5 +161,34 @@ public class ChatService {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to send message.").build();
         }
+    }
+
+    @GET
+    @Path("/offline-notifications")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOfflineNotifications(@HeaderParam("token") String token) {
+        UserEntity currentUser = tokenDao.getTokensUser(token);
+        if (currentUser == null) {
+            return Response.status(401).entity("Invalid token.").build();
+        }
+
+        // You will need to add a method to MessageDao to get all UNREAD messages where the receiver is the currentUser
+        List<MessageEntity> unreadMessages = messageDao.getAllUnreadMessagesForUser(currentUser.getId());
+
+        // We will format them into a JSON array that matches your frontend store structure
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        for (MessageEntity m : unreadMessages) {
+            String notificationMsg = "New message from " + m.getSender().getUsername() + ": " + m.getText();
+
+            JsonObjectBuilder notifObj = Json.createObjectBuilder()
+                    .add("id", m.getId()) // Use the message ID as the unique key
+                    .add("message", notificationMsg)
+                    .add("read", false);
+
+            arrayBuilder.add(notifObj);
+        }
+
+        return Response.status(200).entity(arrayBuilder.build().toString()).build();
     }
 }

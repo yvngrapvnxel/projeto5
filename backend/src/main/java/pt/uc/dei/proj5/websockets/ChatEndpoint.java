@@ -1,12 +1,12 @@
 package pt.uc.dei.proj5.websockets;
 
 import jakarta.inject.Inject;
-import jakarta.persistence.Id;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import java.io.StringReader;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -14,10 +14,8 @@ import jakarta.json.JsonReader;
 import pt.uc.dei.proj5.beans.UserBean;
 import pt.uc.dei.proj5.dao.AdminDao;
 import pt.uc.dei.proj5.dao.MessageDao;
-import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.MessageEntity;
 import pt.uc.dei.proj5.entity.UserEntity;
-
 
 @ServerEndpoint("/chat/{id}")
 public class ChatEndpoint {
@@ -31,19 +29,26 @@ public class ChatEndpoint {
     @Inject
     private MessageDao messageDao;
 
-
-    private static final Map<Long, Session> chatSessions = new ConcurrentHashMap<>();
+    // CHANGED: Now maps a User ID to a Set of Sessions to support multiple tabs
+    private static final Map<Long, Set<Session>> chatSessions = new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("id") Long senderID) {
-        chatSessions.put(senderID, session);
-        System.out.println("User joined chat. ID: " + senderID);
+        // Create the Set if it doesn't exist, then add the new tab's session
+        chatSessions.computeIfAbsent(senderID, k -> ConcurrentHashMap.newKeySet()).add(session);
+        System.out.println("User joined chat. ID: " + senderID + " | Session: " + session.getId());
     }
 
     @OnClose
     public void onClose(Session session, @PathParam("id") Long senderID) {
-        chatSessions.remove(senderID);
-        System.out.println("User left chat. ID: " + senderID);
+        Set<Session> userSessions = chatSessions.get(senderID);
+        if (userSessions != null) {
+            userSessions.remove(session);
+            if (userSessions.isEmpty()) {
+                chatSessions.remove(senderID);
+            }
+        }
+        System.out.println("User left chat. ID: " + senderID + " | Session: " + session.getId());
     }
 
     @OnError
@@ -53,20 +58,16 @@ public class ChatEndpoint {
 
     @OnMessage
     public void onMessage(String jsonMessage, @PathParam("id") Long senderID) {
-        // Log the exact payload so we know what is triggering events
         System.out.println("WS Received from " + senderID + ": " + jsonMessage);
 
         try (JsonReader reader = Json.createReader(new StringReader(jsonMessage))) {
             JsonObject incomingJson = reader.readObject();
 
-            // 1. SAFELY extract 'type'
             String type = null;
-
             if (incomingJson.containsKey("type") && !incomingJson.isNull("type")) {
                 type = incomingJson.getString("type");
             }
 
-            // 2. SAFELY extract receiver ID
             Long receiverID = null;
             if (incomingJson.containsKey("receiver") && !incomingJson.isNull("receiver")) {
                 try {
@@ -76,37 +77,34 @@ public class ChatEndpoint {
                 }
             }
 
-            // Abort if the message makes no sense (no receiver)
             if (receiverID == null) {
                 System.out.println("Abort: No valid receiver ID found.");
                 return;
             }
 
-            // Use equalsIgnoreCase to be safe against accidental casing issues
-            if ("READ".equalsIgnoreCase(type.trim())) {
+            if ("READ".equalsIgnoreCase(type != null ? type.trim() : "")) {
                 System.out.println("Processing READ receipt. Updater: " + senderID + ", Target: " + receiverID);
 
-                // Update DB
                 messageDao.markMessagesAsRead(senderID, receiverID);
 
-                // Notify original sender
-                Session originalSenderSession = chatSessions.get(receiverID);
-                if (originalSenderSession != null && originalSenderSession.isOpen()) {
+                // CHANGED: Send READ receipt to ALL open tabs of the original sender
+                Set<Session> originalSenderSessions = chatSessions.get(receiverID);
+                if (originalSenderSessions != null) {
                     JsonObject outgoingJson = Json.createObjectBuilder()
                             .add("type", "READ")
                             .add("readerId", senderID)
                             .build();
 
-                    System.out.println("Forwarding READ receipt to session " + receiverID);
-                    originalSenderSession.getBasicRemote().sendText(outgoingJson.toString());
+                    for (Session s : originalSenderSessions) {
+                        if (s.isOpen()) {
+                            s.getBasicRemote().sendText(outgoingJson.toString());
+                        }
+                    }
                 } else {
                     System.out.println("Target session " + receiverID + " is offline. Skipping real-time forward.");
                 }
 
             } else {
-                // --- HANDLE NORMAL TEXT MESSAGE ---
-
-                // 3. SAFELY extract 'text'
                 if (!incomingJson.containsKey("text") || incomingJson.isNull("text")) {
                     System.out.println("Abort: Normal message received but no 'text' field was found.");
                     return;
@@ -125,8 +123,9 @@ public class ChatEndpoint {
                     messageDao.saveMessage(newMsg);
                 }
 
-                Session receiverSession = chatSessions.get(receiverID);
-                if (receiverSession != null && receiverSession.isOpen()) {
+                // CHANGED: Send MESSAGE to ALL open tabs of the receiver
+                Set<Session> receiverSessions = chatSessions.get(receiverID);
+                if (receiverSessions != null) {
                     JsonObject outgoingJson = Json.createObjectBuilder()
                             .add("type", "MESSAGE")
                             .add("sender", senderID)
@@ -134,8 +133,11 @@ public class ChatEndpoint {
                             .add("text", text)
                             .build();
 
-
-                    receiverSession.getBasicRemote().sendText(outgoingJson.toString());
+                    for (Session s : receiverSessions) {
+                        if (s.isOpen()) {
+                            s.getBasicRemote().sendText(outgoingJson.toString());
+                        }
+                    }
                 }
 
                 if (senderEntity != null) {
@@ -150,11 +152,12 @@ public class ChatEndpoint {
         }
     }
 
-    // NEW: Helper method so the REST API can trigger a WebSocket push
+    // Helper method so the REST API can trigger a WebSocket push
     public static void sendRealTimeMessage(Long senderId, Long receiverId, String text) {
-        Session receiverSession = chatSessions.get(receiverId);
+        // CHANGED: Send REST push to ALL open tabs of the receiver
+        Set<Session> receiverSessions = chatSessions.get(receiverId);
 
-        if (receiverSession != null && receiverSession.isOpen()) {
+        if (receiverSessions != null) {
             try {
                 JsonObject outgoingJson = Json.createObjectBuilder()
                         .add("type", "MESSAGE")
@@ -163,8 +166,12 @@ public class ChatEndpoint {
                         .add("text", text)
                         .build();
 
-                receiverSession.getBasicRemote().sendText(outgoingJson.toString());
-                System.out.println("REST explicitly pushed message to WS session: " + receiverId);
+                for (Session s : receiverSessions) {
+                    if (s.isOpen()) {
+                        s.getBasicRemote().sendText(outgoingJson.toString());
+                    }
+                }
+                System.out.println("REST explicitly pushed message to WS sessions of user: " + receiverId);
             } catch (Exception e) {
                 System.err.println("Failed to push real-time message from REST: " + e.getMessage());
             }

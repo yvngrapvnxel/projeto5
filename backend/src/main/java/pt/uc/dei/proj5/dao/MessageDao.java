@@ -8,15 +8,12 @@ import pt.uc.dei.proj5.entity.MessageEntity;
 import java.io.Serializable;
 import java.util.List;
 
-
 @Stateless
 public class MessageDao extends DefaultDao<MessageEntity> implements Serializable {
-
 
     public MessageDao() {
         super(MessageEntity.class);
     }
-
 
     public void saveMessage(MessageEntity message) {
         persist(message);
@@ -36,9 +33,7 @@ public class MessageDao extends DefaultDao<MessageEntity> implements Serializabl
         return query.executeUpdate();
     }
 
-
     public List<MessageEntity> getChatHistory(Long user1Id, Long user2Id) {
-
         // It also orders them chronologically (oldest at the top, newest at the bottom).
         String jpql = "SELECT m FROM MessageEntity m " +
                 "WHERE (m.sender.id = :u1 AND m.receiver.id = :u2) " +
@@ -48,6 +43,19 @@ public class MessageDao extends DefaultDao<MessageEntity> implements Serializabl
         TypedQuery<MessageEntity> query = em.createQuery(jpql, MessageEntity.class);
         query.setParameter("u1", user1Id);
         query.setParameter("u2", user2Id);
+
+        return query.getResultList();
+    }
+
+    // --- NEW METHOD FOR OFFLINE NOTIFICATIONS ---
+    public List<MessageEntity> getAllUnreadMessagesForUser(Long receiverId) {
+        // Find all unread messages for this specific user, newest first
+        String jpql = "SELECT m FROM MessageEntity m " +
+                "WHERE m.receiver.id = :receiverId AND m.isRead = false " +
+                "ORDER BY m.timestamp DESC";
+
+        TypedQuery<MessageEntity> query = em.createQuery(jpql, MessageEntity.class);
+        query.setParameter("receiverId", receiverId);
 
         return query.getResultList();
     }

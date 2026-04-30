@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { API_URL } from "./config";
 import LoginPage from './Login';
 import RegisterPage from './Register';
 import Dashboard from './Dashboard';
@@ -22,98 +23,114 @@ const ProtectedRoute = ({ children }) => {
     return children;
 };
 
+// 1. Hook de inatividade corrigido (funções movidas para dentro do useEffect)
+const useIdleTimeout = (timeoutMinutes = 15) => {
+    const timeoutRef = useRef(null);
 
-function App() {
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        // Movemos as funções para dentro para evitar o missing dependency warning
+        const logoutUser = () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            alert("Sessão expirada por inatividade. Por favor, faça login novamente.");
+            localStorage.removeItem('token');
+            useUserStore.getState().logout();
+            window.location.href = '/login';
+        };
+
+        const resetTimer = () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(logoutUser, timeoutMinutes * 60 * 1000);
+        };
+
+        const events = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'];
+        resetTimer();
+
+        events.forEach((event) => window.addEventListener(event, resetTimer));
+
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            events.forEach((event) => window.removeEventListener(event, resetTimer));
+        };
+    }, [timeoutMinutes]);
+};
+
+
+// 2. GlobalApp continua igual
+function GlobalApp() {
 
     const id = useUserStore((state) => state.user.id);
     const addNotification = useNotificationStore((state) => state.addNotification);
+    const setNotifications = useNotificationStore((state) => state.setNotifications);
+
+    // Inicia o timer de inatividade (15 minutos)
+    useIdleTimeout(15);
 
     useEffect(() => {
+        if (!id || id === 'undefined') {
+            return;
+        }
 
-        if (!id) return;
+        // 1. FETCH OFFLINE NOTIFICATIONS
+        const fetchOfflineNotifications = async () => {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`${API_URL}/chat/offline-notifications`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'token': token
+                    }
+                });
 
-        // 'ws://' instead of 'http://'
-        const socket = new WebSocket(`ws://localhost:8080/notifications/${id}`);
-
-
-        socket.onopen = () => {
-            console.log("Connected to WebSocket for notifications.");
+                if (response.ok) {
+                    const offlineData = await response.json();
+                    setNotifications(offlineData);
+                }
+            } catch (error) {
+                console.error("Failed to fetch offline notifications:", error);
+            }
         };
 
+        fetchOfflineNotifications();
+
+        // 2. THEN CONNECT TO WEBSOCKET FOR LIVE NOTIFICATIONS
+        const socket = new WebSocket(`ws://localhost:8080/notifications/${id}`);
+
+        socket.onopen = () => console.log("Connected to WebSocket for notifications.");
 
         socket.onmessage = (event) => {
+            // Live notifications are just plain text strings from your backend
             addNotification(event.data);
         };
 
+        socket.onerror = (error) => console.error("Notification WS Error:", error);
 
         return () => {
             if (socket.readyState === WebSocket.CONNECTING) {
-                // If it's still connecting, wait for it to open, then close it safely
                 socket.addEventListener('open', () => socket.close());
             } else {
-                // Otherwise, close it normally
                 socket.close();
             }
         };
-    }, [id, addNotification]);
+    }, [id, addNotification, setNotifications]);
 
 
     return (
-        <BrowserRouter>
-
+        <>
             <Navbar />
             {localStorage.getItem('token') ? <ChatBox /> : null}
 
             <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-
-                {/* user profile */}
-                <Route
-                    path="/profile"
-                    element={
-                        <ProtectedRoute>
-                            <ProfilePage />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* dashboard */}
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* clientes */}
-                <Route path="/clients" element={
-                    <ProtectedRoute>
-                        <ClientsPage />
-                    </ProtectedRoute>
-                }
-                />
-
-                {/* leads */}
-                <Route path="/leads" element={
-                    <ProtectedRoute>
-                        <LeadsPage />
-                    </ProtectedRoute>
-                }
-                />
-
-                {/* admin */}
-                <Route path="/admin" element={
-                    <ProtectedRoute>
-                        <AdminPage />
-                    </ProtectedRoute>
-                }
-                />
-
-
-                {/* no path consoante token */}
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/clients" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />
+                <Route path="/leads" element={<ProtectedRoute><LeadsPage /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
                 <Route
                     path="/"
                     element={
@@ -122,11 +139,17 @@ function App() {
                             : <Navigate to="/login" />
                     }
                 />
-
             </Routes>
-        </BrowserRouter>
+        </>
     );
 }
 
+function App() {
+    return (
+        <BrowserRouter>
+            <GlobalApp />
+        </BrowserRouter>
+    );
+}
 
 export default App;

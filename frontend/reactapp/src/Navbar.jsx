@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {API_URL} from './config';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { API_URL } from './config';
 import userStore from './stores/userStore';
 import useAdminStore from './stores/adminStore';
 import useClientStore from './stores/clientStore';
@@ -35,27 +35,27 @@ const Navbar = () => {
         }
         localStorage.removeItem('token');
         clearStore();
-        useClientStore.setState({clients: []});
-        useLeadStore.setState({leads: []});
-        useAdminStore.setState({users: [], selectedUserClients: [], selectedUserLeads: []});
-        useNotificationStore.setState({notifications: []}); // Good practice to clear notifs on logout too
+        useClientStore.setState({ clients: [] });
+        useLeadStore.setState({ leads: [] });
+        useAdminStore.setState({ users: [], selectedUserClients: [], selectedUserLeads: [] });
+        useNotificationStore.setState({ notifications: [] });
         navigate('/login');
     };
 
     const [showDropdown, setShowDropdown] = useState(false);
 
-    // 1. Destructure markAllAsRead from your store
-    const {notifications, markAllAsRead} = useNotificationStore();
+    // Destructure markAllAsRead from your store
+    const { notifications, markAllAsRead } = useNotificationStore();
 
-    // 2. Count unread notifications for the badge
+    // Count unread notifications for the badge
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    // 3. Handle clicking the bell
+    // Handle clicking the bell
     const handleBellClick = () => {
         const willOpen = !showDropdown;
         setShowDropdown(willOpen);
 
-        // REQUISITO: Notificações marcadas como lidas ao abrir lista
+        // Mark as read when opening the list
         if (willOpen && unreadCount > 0) {
             markAllAsRead();
         }
@@ -78,16 +78,13 @@ const Navbar = () => {
                 <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                     <div className="p-4">
                         <br></br>
-                        <h4 className="fw-bold mb-4" style={{color: '#2C313C'}}>Menu</h4>
+                        <h4 className="fw-bold mb-4" style={{ color: '#2C313C' }}>Menu</h4>
                         <br></br>
                         <ul className="list-unstyled d-flex flex-column gap-3">
-                            <li><Link to="/dashboard" onClick={toggleSidebar} className="sidebar-link">Dashboard</Link>
-                            </li>
+                            <li><Link to="/dashboard" onClick={toggleSidebar} className="sidebar-link">Dashboard</Link></li>
                             <li><Link to="/clients" onClick={toggleSidebar} className="sidebar-link">Clients</Link></li>
-                            <li><Link to="/leads" onClick={toggleSidebar} className="sidebar-link">Sales Leads</Link>
-                            </li>
-                            {user.admin && (<Link to="/admin" onClick={toggleSidebar} className="sidebar-link"> <i
-                                className="fa-solid fa-crown"></i> Administration</Link>)}
+                            <li><Link to="/leads" onClick={toggleSidebar} className="sidebar-link">Sales Leads</Link></li>
+                            {user.admin && (<Link to="/admin" onClick={toggleSidebar} className="sidebar-link"> <i className="fa-solid fa-crown"></i> Administration</Link>)}
                         </ul>
                     </div>
                 </aside>
@@ -95,16 +92,16 @@ const Navbar = () => {
 
             <nav
                 className="dashboard-nav d-flex justify-content-between align-items-center px-4 py-2 fixed-top bg-white border-bottom"
-                style={{height: '70px'}}>
+                style={{ height: '70px' }}>
 
+                {/* LEFT SIDE: Logo & Hamburger */}
                 <div className="crm-logo d-flex align-items-center gap-3">
-                    {/* hamburger menu */}
                     {!isLoginRegisterPage && (
                         <button
                             className="hamburger-btn btn p-0 border-0"
                             type="button"
                             onClick={toggleSidebar}
-                            style={{fontSize: '1.5rem', color: '#2C313C', lineHeight: '1'}}
+                            style={{ fontSize: '1.5rem', color: '#2C313C', lineHeight: '1' }}
                         >
                             &#9776;
                         </button>
@@ -114,108 +111,76 @@ const Navbar = () => {
                         <img
                             src="/favicon-32x32.png"
                             alt="Paperclip Logo"
-                            style={{width: '28px', height: '28px', objectFit: 'contain'}}
+                            style={{ width: '28px', height: '28px', objectFit: 'contain' }}
                         />
-                        <div className="d-flex flex-column" style={{lineHeight: '1.1'}}>
-                     <span className="fw-bold" style={{
-                         color: '#2C313C',
-                         fontSize: '1.1rem',
-                         textTransform: 'uppercase',
-                         letterSpacing: '1px'
-                     }}>
-                        Dunder Mifflin
-                     </span>
-                            <span style={{color: '#3C78B4', fontSize: '0.75rem', fontWeight: '600', marginTop: '-2px'}}>
-                        Paper Company, Inc.
-                     </span>
+                        <div className="d-flex flex-column" style={{ lineHeight: '1.1' }}>
+                            <span className="fw-bold" style={{
+                                color: '#2C313C',
+                                fontSize: '1.1rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px'
+                            }}>
+                                Dunder Mifflin
+                            </span>
+                            <span style={{ color: '#3C78B4', fontSize: '0.75rem', fontWeight: '600', marginTop: '-2px' }}>
+                                Paper Company, Inc.
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                {!isLoginRegisterPage && (
-                    <div className="notification-wrapper" style={{ position: 'relative' }}>
-                        <button onClick={handleBellClick} className="bell-btn" style={{ position: 'relative', border: 'none', background: 'none' }}>
-                            <i className="bi bi-bell-fill" style={{ fontSize: '1.5rem' }}></i>
-                            {/* REQUISITO: Contador sempre visível */}
-                            {unreadCount > 0 && (
-                                <span className="notification-badge" style={{
-                                    position: 'absolute',
-                                    top: '-5px',
-                                    right: '-5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    borderRadius: '50%',
-                                    padding: '2px 6px',
-                                    fontSize: '10px',
-                                    fontWeight: 'bold'
-                                }}>
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </button>
-
-                        {showDropdown && (
-                            <div className="notification-dropdown" style={{
-                                position: 'absolute',
-                                right: 0,
-                                top: '100%',
-                                backgroundColor: 'white',
-                                border: '1px solid #ccc',
-                                borderRadius: '5px',
-                                width: '300px',
-                                maxHeight: '400px',
-                                overflowY: 'auto',
-                                zIndex: 1000,
-                                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                            }}>
-                                <div className="dropdown-header" style={{ padding: '10px', borderBottom: '1px solid #eee', backgroundColor: '#f8f9fa' }}>
-                                    <h5 style={{ margin: 0 }}>Notifications</h5>
-                                </div>
-                                <div className="dropdown-body">
-                                    {notifications.length === 0 ? (
-                                        <p className="no-notifs" style={{ padding: '15px', margin: 0, textAlign: 'center', color: '#666' }}>No new notifications</p>
-                                    ) : (
-                                        notifications.map((notif) => (
-                                            <div key={notif.id} className="notification-item" style={{
-                                                padding: '12px 15px',
-                                                borderBottom: '1px solid #eee',
-                                                fontSize: '0.9rem',
-                                                color: '#333'
-                                            }}>
-                                                {notif.message}
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {isLoginRegisterPage && (
-
-                    <>
-                        <div className="d-flex align-items-center gap-3">
-                            <div className="d-flex flex-column align-items-end">
-                        <span className="fw-semibold text-muted text-end"
-                              style={{fontSize: '0.85rem', lineHeight: '1.2'}}>
-                           "Welcome! I think this is going to be good. I'm not gonna say 'great', because I don't want to overpromise."
-                        </span>
-                                <span className="text-secondary" style={{fontSize: '0.7rem', marginTop: '2px'}}>
-                           — Michael Scott
-                        </span>
-                            </div>
+                {/* RIGHT SIDE: Dynamic based on Login vs Dashboard */}
+                {isLoginRegisterPage ? (
+                    <div className="d-flex align-items-center gap-3">
+                        <div className="d-flex flex-column align-items-end">
+                            <span className="fw-semibold text-muted text-end"
+                                  style={{ fontSize: '0.85rem', lineHeight: '1.2' }}>
+                                "Welcome! I think this is going to be good. I'm not gonna say 'great', because I don't want to overpromise."
+                            </span>
+                            <span className="text-secondary" style={{ fontSize: '0.7rem', marginTop: '2px' }}>
+                                — Michael Scott
+                            </span>
                         </div>
-                    </>
+                    </div>
+                ) : (
+                    <div className="d-flex align-items-center gap-4">
 
-                )}
+                        {/* CLEANED NOTIFICATION WIDGET */}
+                        <div className="notification-wrapper">
+                            <button onClick={handleBellClick} className="bell-btn">
+                                <i className="bi bi-bell-fill"></i>
+                                {unreadCount > 0 && (
+                                    <span className="notification-badge">
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </button>
 
-                {!isLoginRegisterPage && (
-                    <>
+                            {showDropdown && (
+                                <div className="notification-dropdown">
+                                    <div className="dropdown-header">
+                                        <h4>Notifications</h4>
+                                    </div>
+                                    <div className="dropdown-body">
+                                        {notifications.length === 0 ? (
+                                            <p className="no-notifs">No new notifications</p>
+                                        ) : (
+                                            notifications.map((notif) => (
+                                                <div key={notif.id} className="notification-item">
+                                                    {notif.message}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* USER PROFILE & LOGOUT */}
                         <div className="d-flex align-items-center gap-3">
-                     <span className="fw-semibold text-muted">
-                        Welcome{', ' + user.firstName || ' Employee'}!
-                     </span>
+                            <span className="fw-semibold text-muted">
+                                Welcome{', ' + user.firstName || ' Employee'}!
+                            </span>
 
                             <Link to="/profile">
                                 <img
@@ -238,10 +203,10 @@ const Navbar = () => {
                             </Link>
 
                             <button className="btn btn-sm btn-outline-danger" onClick={handleLogout}>
-                                Logout <i class="bi bi-box-arrow-right"></i>
+                                Logout <i className="bi bi-box-arrow-right"></i>
                             </button>
                         </div>
-                    </>
+                    </div>
                 )}
             </nav>
         </>
