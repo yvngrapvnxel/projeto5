@@ -94,7 +94,7 @@ public class UserBean implements Serializable {
         String rawToken = tokenBean.generateToken();
         tokenDao.guardarTokenDB(rawToken, user, 1);
 
-        String link = "http://localhost:3000/register?mode=reset&email=" + email + "token=" + rawToken;
+        String link = "http://localhost:3000/register?mode=reset&email=" + email + "&token=" + rawToken;
         String subject = "Dunder Mifflin CRM - Password Recovery";
         String body = "<h3>Password Reset Request</h3>" +
                 "<p>Click the link below to securely reset your password. This link expires in 1 hour.</p>" +

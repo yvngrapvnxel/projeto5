@@ -116,7 +116,9 @@ public class UserService {
     @Path("/forgot-password")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response forgotPassword(String email) {
+    public Response forgotPassword(Map<String, String> payload) {
+
+        String email = payload.get("email");
 
         if (email == null || email.trim().isEmpty()) {
             return Response.status(400).entity("E-mail is required.").build();
