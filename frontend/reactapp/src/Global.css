@@ -730,3 +730,12 @@ body.no-bg .dashboard-container {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
+
+/* STATISTICS */
+
+.recharts-sector:focus,
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus,
+.recharts-surface:focus {
+  outline: none !important;
+}

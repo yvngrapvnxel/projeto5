@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 // 1. Hook de inatividade corrigido (funções movidas para dentro do useEffect)
-const useIdleTimeout = (timeoutMinutes = 15) => {
+const useIdleTimeout = (timeoutMinutes = 1) => {
     const timeoutRef = useRef(null);
 
     useEffect(() => {
