@@ -57,7 +57,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
         String encriptado = encriptar(token);
 
         try {
-            return em.createQuery("SELECT u FROM UserEntity u JOIN u.tokens t WHERE t.token = :token AND u.isActive = true", UserEntity.class)
+            return em.createQuery("SELECT u FROM UserEntity u JOIN u.tokens t WHERE t.token = :token", UserEntity.class)
                     .setParameter("token", encriptado)
                     .getSingleResult();
         } catch (NoResultException e) {

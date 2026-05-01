@@ -5,7 +5,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pt.uc.dei.proj5.beans.TokenBean;
 import pt.uc.dei.proj5.beans.UserBean;
+import pt.uc.dei.proj5.dao.TokenDao;
+import pt.uc.dei.proj5.dao.UserDao;
 import pt.uc.dei.proj5.dto.UserDto;
+import pt.uc.dei.proj5.entity.UserEntity;
+
+import java.util.Map;
 
 
 @Path("/users")
@@ -16,7 +21,13 @@ public class UserService {
     UserBean userBean;
 
     @Inject
+    UserDao userDao;
+
+    @Inject
     TokenBean tokenBean;
+
+    @Inject
+    TokenDao tokenDao;
 
 
     // --- LOGIN
@@ -59,22 +70,88 @@ public class UserService {
     }
 
 
-    // --- REGISTER
+    // --- CONFIRM ACCOUNT REGISTER
 
     @POST
-    @Path("/register")
+    @Path("/confirm-account")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response register(UserDto newUser) {
+    public Response confirmAccount(Map<String, String> payload) {
+        String token = payload.get("token");
+        String email = payload.get("email");
+        String newUsername = payload.get("username");
 
-        boolean success = userBean.register(newUser);
-
-        if (!success) {
-            return Response.status(404).entity("There was an error registering a new user.").build();
+        if (token == null || email == null) {
+            return Response.status(400).entity("Missing security token or email.").build();
         }
 
-        return Response.status(201).entity("User registered successfully!").build();
+        UserEntity user = tokenDao.getTokensUser(token);
+        if (user == null || !user.getEmail().equals(email) || user.isActive()) {
+            return Response.status(403).entity("Account not found or is already active.").build();
+        }
 
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            return Response.status(400).entity("Username is required.").build();
+        }
+
+        if (!email.equals(newUsername)) {
+            if (userDao.usernameAlreadyExists(newUsername)) {
+                return Response.status(400).entity("That username is already taken. Please choose another.").build();
+            }
+            user.setUsername(newUsername);
+        }
+
+        boolean success = userBean.confirmAccount(payload);
+
+        if (!success) {
+            return Response.status(400).entity("Invalid or expired invitation token.").build();
+        }
+
+        return Response.status(200).entity("Account confirmed successfully!").build();
+    }
+
+    // --- FORGOT PASSWORD REQUEST
+
+    @POST
+    @Path("/forgot-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response forgotPassword(String email) {
+
+        if (email == null || email.trim().isEmpty()) {
+            return Response.status(400).entity("E-mail is required.").build();
+        }
+
+        boolean success = userBean.requestPasswordReset(email);
+
+        if (success) {
+            return Response.status(200).entity("Recovery e-mail sent.").build();
+        }
+
+        return Response.status(200).entity("If the e-mail exists, a link was sent.").build();
+    }
+
+    // --- RESET PASSWORD
+
+    @POST
+    @Path("/reset-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response resetPassword(Map<String, String> payload) {
+        String token = payload.get("token");
+        String newPassword = payload.get("newPassword");
+
+        if (token == null || newPassword == null || newPassword.trim().isEmpty()) {
+            return Response.status(400).entity("Incomplete data.").build();
+        }
+
+        boolean success = userBean.resetPassword(token, newPassword);
+
+        if (!success) {
+            return Response.status(400).entity("Invalid or expired reset token.").build();
+        }
+
+        return Response.status(200).entity("Password updated successfully.").build();
     }
 
 

@@ -69,6 +69,14 @@ public class AdminService {
         String inviteToken = adminBean.createInvitation(email);
 
         // TODO Logic to send email via MailHog
+        String link = "http://localhost:3000/register?mode=confirm&email=" + email + "&token=" + inviteToken;
+
+        String subject = "Dunder Mifflin CRM - Account Invitation";
+        String body = "<h3>Welcome to Dunder Mifflin!</h3>" +
+                "<p>You have been invited to join the CRM. Please click the link below to set up your account:</p>" +
+                "<a href=" + link + ">Confirm Account</a>";
+
+        boolean sent = adminBean.sendEmail(email, subject, body);
 
         return Response.ok("Invitation sent to " + email).build();
     }

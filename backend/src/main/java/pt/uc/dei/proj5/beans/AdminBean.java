@@ -2,6 +2,9 @@ package pt.uc.dei.proj5.beans;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import pt.uc.dei.proj5.dao.*;
 import pt.uc.dei.proj5.entity.ClientEntity;
 import pt.uc.dei.proj5.dto.UserDto;
@@ -9,7 +12,9 @@ import pt.uc.dei.proj5.entity.LeadEntity;
 import pt.uc.dei.proj5.entity.UserEntity;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 @Stateless
 public class AdminBean implements Serializable {
@@ -179,4 +184,40 @@ public class AdminBean implements Serializable {
 
         return adminDao.hardDeleteLead(ID);
     }
+
+
+    // --- SEND INVITATION EMAIL
+
+    public boolean sendEmail(String receiver, String subject, String bodyHTML) {
+        try {
+            // config mailhog
+            Properties props = new Properties();
+            props.put("mail.smtp.host", "localhost");
+            props.put("mail.smtp.port", "1025");
+            props.put("mail.smtp.auth", "false");
+            props.put("mail.smtp.starttls.enable", "false");
+
+            Session session = Session.getInstance(props);
+
+            // mensagem
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("no-reply@dundermifflin.com", "CRM Admin"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
+            message.setSubject(subject);
+            message.setSentDate(new Date());
+            message.setContent(bodyHTML, "text/html; charset=UTF-8");
+
+            Transport.send(message);
+
+
+            System.out.println("E-mail successfully sent to: " + receiver);
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error sending e-mail to: " + receiver);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

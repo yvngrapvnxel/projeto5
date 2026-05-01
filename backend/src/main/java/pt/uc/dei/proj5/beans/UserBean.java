@@ -1,7 +1,12 @@
 package pt.uc.dei.proj5.beans;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 import pt.uc.dei.proj5.dao.TokenDao;
 import pt.uc.dei.proj5.dao.UserDao;
 import pt.uc.dei.proj5.entity.UserEntity;
@@ -20,6 +25,9 @@ public class UserBean implements Serializable {
 
     @Inject
     TokenBean tokenBean;
+
+    @Inject
+    AdminBean adminBean;
 
 
     // --- LOGIN
@@ -48,19 +56,67 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- REGISTER
+    // --- CONFIRM ACCOUNT REGISTER
 
-    public boolean register(UserDto newUser) {
+    public boolean confirmAccount(Map<String, String> payload) {
+        String token = payload.get("token");
 
-        String username = newUser.getUsername();
+        UserEntity user = tokenDao.getTokensUser(token);
 
-        // verifica se o username já existe
-        if (userDao.usernameAlreadyExists(username)) {
+        user.setFirstName(payload.get("firstName"));
+        user.setLastName(payload.get("lastName"));
+        user.setPhone(payload.get("phone"));
+        user.setPassword(payload.get("password"));
+        user.setUsername(payload.get("username"));
+        if (payload.get("photoUrl") != null) {
+            user.setPhotoUrl(payload.get("photoUrl"));
+        }
+
+        user.setIsActive(true);
+        userDao.merge(user);
+
+        tokenDao.setExpired(token);
+        return true;
+    }
+
+    // --- REQUEST PASSWORD RESET
+    public boolean requestPasswordReset(String email) {
+        List<UserEntity> users = userDao.passwordReset(email);
+        if (users.isEmpty()) {
             return false;
         }
 
-        // regista o utilizador na DB
-        userDao.novoUserDB(newUser);
+        UserEntity user = users.getFirst();
+        if (user == null) {
+            return false;
+        }
+
+        String rawToken = tokenBean.generateToken();
+        tokenDao.guardarTokenDB(rawToken, user, 1);
+
+        String link = "http://localhost:3000/register?mode=reset&email=" + email + "token=" + rawToken;
+        String subject = "Dunder Mifflin CRM - Password Recovery";
+        String body = "<h3>Password Reset Request</h3>" +
+                "<p>Click the link below to securely reset your password. This link expires in 1 hour.</p>" +
+                "<a href=" + link + ">Reset My Password</a>";
+
+        return adminBean.sendEmail(email, subject, body);
+    }
+
+
+    // --- RESET PASSWORD
+
+    public boolean resetPassword(String token, String newPassword) {
+        UserEntity user = tokenDao.getTokensUser(token);
+
+        if (user == null) {
+            return false;
+        }
+
+        user.setPassword(newPassword);
+        userDao.merge(user);
+
+        tokenDao.setExpired(token);
         return true;
     }
 

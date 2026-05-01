@@ -122,7 +122,7 @@ function GlobalApp() {
     return (
         <>
             <Navbar />
-            {localStorage.getItem('token') ? <ChatBox /> : null}
+            {localStorage.getItem('token') && window.location.pathname !== '/register' ? <ChatBox /> : null}
 
             <Routes>
                 <Route path="/login" element={<LoginPage />} />

@@ -95,6 +95,12 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
         em.merge(u);
     }
 
+    public List<UserEntity> passwordReset(String email) {
+        return em.createQuery("SELECT u FROM UserEntity u WHERE u.email = :email", UserEntity.class)
+                .setParameter("email", email)
+                .getResultList();
+    }
+
     public UserEntity findEntity(Long ID) {
         return em.find(UserEntity.class, ID);
     }

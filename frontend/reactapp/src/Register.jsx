@@ -15,6 +15,7 @@ const RegisterPage = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
+        username: '',
         email: emailFromUrl,
         phone: '',
         password: '',
@@ -108,6 +109,12 @@ const RegisterPage = () => {
                                         <input type="text" name="lastName" required className="form-control form-input"
                                                value={formData.lastName} onChange={handleChange} />
                                     </div>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Choose a Username</label>
+                                    <input type="text" name="username" required className="form-control form-input"
+                                           value={formData.username} onChange={handleChange} />
                                 </div>
 
                                 <div className="row mb-3">
