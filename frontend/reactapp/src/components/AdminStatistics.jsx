@@ -4,11 +4,13 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer,
     BarChart, Bar
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import '../Global.css';
 
 const COLORS = ['#3C78B4', '#F6A623', '#5D9CEC', '#9B9B9B', '#7ED321'];
 
 const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
+    const { t } = useTranslation();
 
     const totalUsers = users.length;
     const totalClients = clients.length;
@@ -109,25 +111,25 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
             <div className="row mb-4">
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
-                        <h6 className="text-muted">Total Users</h6>
+                        <h6 className="text-muted">{t('adminStats.totalUsers')}</h6>
                         <h2 className="text-dunder-blue">{totalUsers}</h2>
                     </div>
                 </div>
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
-                        <h6 className="text-muted">Confirmed Accounts</h6>
+                        <h6 className="text-muted">{t('adminStats.confirmedAccounts')}</h6>
                         <h2 className="text-success-bold">{confirmedAccounts}</h2>
                     </div>
                 </div>
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
-                        <h6 className="text-muted">Total Clients</h6>
+                        <h6 className="text-muted">{t('adminStats.totalClients')}</h6>
                         <h2 className="text-dunder-dark-blue">{totalClients}</h2>
                     </div>
                 </div>
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
-                        <h6 className="text-muted">Total Leads</h6>
+                        <h6 className="text-muted">{t('adminStats.totalLeads')}</h6>
                         <h2 className="text-warning-bold">{totalLeads}</h2>
                     </div>
                 </div>
@@ -138,7 +140,7 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
 
                 <div className="col-lg-7 mb-3">
                     <div className="card shadow-sm border-0 p-3 h-100 d-flex flex-column">
-                        <h5 className="text-center mb-3">Top Sales Reps (Clients & Leads)</h5>
+                        <h5 className="text-center mb-3">{t('adminStats.topReps')}</h5>
                         <div className="flex-grow-1">
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart data={topPerformers} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -157,7 +159,7 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
 
                 <div className="col-lg-5 mb-3">
                     <div className="card shadow-sm border-0 p-3 h-100 d-flex flex-column">
-                        <h5 className="text-center mb-3">Leads by State</h5>
+                        <h5 className="text-center mb-3">{t('adminStats.leadsByState')}</h5>
                         <div className="flex-grow-1">
                             <ResponsiveContainer width="100%" height={300}>
                                 <PieChart>
@@ -180,7 +182,7 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
             <div className="row mb-5">
                 <div className="col-12">
                     <div className="card shadow-sm border-0 p-4">
-                        <h5 className="text-center mb-4">Temporal Evolution (Clients & Leads)</h5>
+                        <h5 className="text-center mb-4">{t('adminStats.temporalEvolution')}</h5>
                         <div className="flex-grow-1">
                             <ResponsiveContainer width="100%" height={350}>
                                 <LineChart data={evolutionData}>

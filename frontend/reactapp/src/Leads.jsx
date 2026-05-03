@@ -4,6 +4,7 @@ import useUserStore from './stores/userStore';
 import useAdminStore from './stores/adminStore';
 import { CRMRow } from './components/tables';
 import { CRMModal } from './components/edit-modal';
+import { useTranslation } from 'react-i18next';
 
 
 const LeadsPage = () => {
@@ -12,21 +13,22 @@ const LeadsPage = () => {
     const { leads, loading, fetchLeads, addLead, updateLead, deleteLead } = useLeadStore();
     const { reactivateLead } = useAdminStore();
     const user = useUserStore((state) => state.user);
+    const { t } = useTranslation();
 
 
     const leadFields = [
-        { name: 'title', label: 'Lead Title', type: 'text', col: 'col-12' },
-        { name: 'description', label: 'Description', type: 'textarea', col: 'col-12' },
+        { name: 'title', label: t('leadsPage.leadTitle'), type: 'text', col: 'col-12' },
+        { name: 'description', label: t('leadsPage.tableDescription'), type: 'textarea', col: 'col-12' },
         {
             name: 'state',
-            label: 'Pipeline State',
+            label: t('leadsPage.pipelineState'),
             type: 'select',
             options: [
-                { value: 0, label: 'New' },
-                { value: 1, label: 'Under Review' },
-                { value: 2, label: 'Proposal Sent' },
-                { value: 3, label: 'Archive' },
-                { value: 4, label: 'Won' }
+                { value: 0, label: t('leadsPage.new') },
+                { value: 1, label: t('leadsPage.underReview') },
+                { value: 2, label: t('leadsPage.proposalSent') },
+                { value: 3, label: t('leadsPage.archive') },
+                { value: 4, label: t('leadsPage.won') }
             ],
             col: 'col-12'
         },
@@ -69,7 +71,7 @@ const LeadsPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm("Deactivate this lead?")) {
+        if (window.confirm(t('leadsPage.confirmDeactivate'))) {
             await deleteLead(id);
         }
     };
@@ -86,7 +88,7 @@ const LeadsPage = () => {
             <div className="container py-4">
                 <div className="d-flex justify-content-between mb-4">
 
-                    <h2 className="fw-bold">Leads Pipeline</h2>
+                    <h2 className="fw-bold">{t('leadsPage.title')}</h2>
 
                     <div className="d-flex gap-3">
 
@@ -95,16 +97,16 @@ const LeadsPage = () => {
                             value={filterState}
                             onChange={(e) => setFilterState(e.target.value)}
                         >
-                            <option value="all">All</option>
-                            <option value="0">New</option>
-                            <option value="1">Under Review</option>
-                            <option value="2">Proposal Sent</option>
-                            <option value="3">Archive</option>
-                            <option value="4">Won</option>
+                            <option value="all">{t('leadsPage.all')}</option>
+                            <option value="0">{t('leadsPage.new')}</option>
+                            <option value="1">{t('leadsPage.underReview')}</option>
+                            <option value="2">{t('leadsPage.proposalSent')}</option>
+                            <option value="3">{t('leadsPage.archive')}</option>
+                            <option value="4">{t('leadsPage.won')}</option>
                         </select>
 
                         <button className="btn btn-primary" style={{ backgroundColor: '#2D5A88' }} onClick={() => setShowModal(true)}>
-                            + Add New Lead
+                            {t('leadsPage.addNew')}
                         </button>
 
                     </div>
@@ -114,7 +116,7 @@ const LeadsPage = () => {
                 {loading ? (
                     <div className="text-center py-5">
                         <div className="spinner-border text-primary" role="status"></div>
-                        <p className="mt-2">Loading Leads...</p>
+                        <p className="mt-2">{t('leadsPage.loading')}</p>
                     </div>
                 ) : (
                     <div className="card shadow-sm border-0">
@@ -122,12 +124,12 @@ const LeadsPage = () => {
                             <table className="table table-hover mb-0">
                                 <thead className="table-light">
                                     <tr>
-                                        <th>Title</th>
-                                        <th>Description</th>
-                                        <th>State</th>
-                                        <th>Creation Date</th>
-                                        <th>Status</th>
-                                        <th className="text-end">Actions</th>
+                                        <th>{t('leadsPage.tableTitle')}</th>
+                                        <th>{t('leadsPage.tableDescription')}</th>
+                                        <th>{t('leadsPage.tableState')}</th>
+                                        <th>{t('leadsPage.tableCreationDate')}</th>
+                                        <th>{t('leadsPage.tableStatus')}</th>
+                                        <th className="text-end">{t('leadsPage.tableActions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -163,7 +165,7 @@ const LeadsPage = () => {
                 show={showModal}
                 onClose={closeModal}
                 onSubmit={handleSave}
-                title={isEditing ? "Edit Lead" : "Add New Lead"}
+                title={isEditing ? t('leadsPage.editLead') : t('leadsPage.addLead')}
                 formData={leadData}
                 setFormData={setLeadData}
                 fields={leadFields}

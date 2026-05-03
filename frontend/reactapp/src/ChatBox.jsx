@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import useUserStore from './stores/userStore';
 import useChatStore from './stores/chatStore';
 import { API_URL } from './config';
+import { useTranslation } from 'react-i18next';
 import './Global.css';
 
 function ChatBox() {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [view, setView] = useState('LIST'); // 'LIST' or 'CHAT'
     const [searchQuery, setSearchQuery] = useState('');
@@ -176,13 +178,13 @@ function ChatBox() {
                 <div className="chat-window">
                     {view === 'LIST' ? (
                         <>
-                            <div className="chat-header"><h4>Chats</h4></div>
+                            <div className="chat-header"><h4>{t('chatBox.chats')}</h4></div>
                             <div className="chat-search">
                                 <div className="search-input-wrapper">
                                     <i className="bi bi-search search-icon"></i>
                                     <input
                                         type="text"
-                                        placeholder="Search users..."
+                                        placeholder={t('chatBox.searchUsers')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
@@ -196,7 +198,7 @@ function ChatBox() {
                                         </div>
                                         <div className="chat-user-info">
                                             <h5>{user.username}</h5>
-                                            <span className="chat-user-status">Click to chat</span>
+                                            <span className="chat-user-status">{t('chatBox.clickToChat')}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -230,7 +232,7 @@ function ChatBox() {
                                     type="text"
                                     value={inputText}
                                     onChange={(e) => setInputText(e.target.value)}
-                                    placeholder="Type..."
+                                    placeholder={t('chatBox.typeMessage')}
                                 />
                                 <button type="submit" disabled={!inputText.trim()}><i className="bi bi-send-fill"></i></button>
                             </form>

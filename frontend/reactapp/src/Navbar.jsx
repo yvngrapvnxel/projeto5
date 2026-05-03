@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { API_URL } from './config';
 import userStore from './stores/userStore';
 import useAdminStore from './stores/adminStore';
@@ -10,6 +11,7 @@ import './Global.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Navbar = () => {
+    const { t } = useTranslation();
 
     const user = userStore((state) => state.user);
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -78,13 +80,13 @@ const Navbar = () => {
                 <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                     <div className="p-4">
                         <br></br>
-                        <h4 className="fw-bold mb-4" style={{ color: '#2C313C' }}>Menu</h4>
+                        <h4 className="fw-bold mb-4" style={{ color: '#2C313C' }}>{t('navbar.menu')}</h4>
                         <br></br>
                         <ul className="list-unstyled d-flex flex-column gap-3">
-                            <li><Link to="/dashboard" onClick={toggleSidebar} className="sidebar-link">Dashboard</Link></li>
-                            <li><Link to="/clients" onClick={toggleSidebar} className="sidebar-link">Clients</Link></li>
-                            <li><Link to="/leads" onClick={toggleSidebar} className="sidebar-link">Sales Leads</Link></li>
-                            {user.admin && (<Link to="/admin" onClick={toggleSidebar} className="sidebar-link"> <i className="fa-solid fa-crown"></i> Administration</Link>)}
+                            <li><Link to="/dashboard" onClick={toggleSidebar} className="sidebar-link">{t('navbar.dashboard')}</Link></li>
+                            <li><Link to="/clients" onClick={toggleSidebar} className="sidebar-link">{t('navbar.clients')}</Link></li>
+                            <li><Link to="/leads" onClick={toggleSidebar} className="sidebar-link">{t('navbar.salesLeads')}</Link></li>
+                            {user.admin && (<Link to="/admin" onClick={toggleSidebar} className="sidebar-link"> <i className="fa-solid fa-crown"></i> {t('navbar.administration')}</Link>)}
                         </ul>
                     </div>
                 </aside>
@@ -135,7 +137,7 @@ const Navbar = () => {
                         <div className="d-flex flex-column align-items-end">
                             <span className="fw-semibold text-muted text-end"
                                   style={{ fontSize: '0.85rem', lineHeight: '1.2' }}>
-                                "Welcome! I think this is going to be good. I'm not gonna say 'great', because I don't want to overpromise."
+                                {t('navbar.quote')}
                             </span>
                             <span className="text-secondary" style={{ fontSize: '0.7rem', marginTop: '2px' }}>
                                 — Michael Scott
@@ -159,11 +161,11 @@ const Navbar = () => {
                             {showDropdown && (
                                 <div className="notification-dropdown">
                                     <div className="dropdown-header">
-                                        <h4>Notifications</h4>
+                                        <h4>{t('navbar.notifications')}</h4>
                                     </div>
                                     <div className="dropdown-body">
                                         {notifications.length === 0 ? (
-                                            <p className="no-notifs">No new notifications</p>
+                                            <p className="no-notifs">{t('navbar.noNotifs')}</p>
                                         ) : (
                                             notifications.map((notif) => (
                                                 <div key={notif.id} className="notification-item">
@@ -179,7 +181,7 @@ const Navbar = () => {
                         {/* USER PROFILE & LOGOUT */}
                         <div className="d-flex align-items-center gap-3">
                             <span className="fw-semibold text-muted">
-                                Welcome{', ' + user.firstName || ' Employee'}!
+                                {t('navbar.welcome')}{', ' + (user.firstName || t('navbar.employee'))}!
                             </span>
 
                             <Link to="/profile">
@@ -203,7 +205,7 @@ const Navbar = () => {
                             </Link>
 
                             <button className="btn btn-sm btn-outline-danger" onClick={handleLogout}>
-                                Logout <i className="bi bi-box-arrow-right"></i>
+                                {t('navbar.logout')} <i className="bi bi-box-arrow-right"></i>
                             </button>
                         </div>
                     </div>

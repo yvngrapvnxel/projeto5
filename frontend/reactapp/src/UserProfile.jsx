@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import userStore from './stores/userStore';
 import { API_URL } from './config';
 import './Global.css';
 
 const ProfilePage = () => {
+    const { t } = useTranslation();
     const { user, setUser } = userStore();
     const [showModal, setShowModal] = useState(false);
 
@@ -23,12 +25,12 @@ const ProfilePage = () => {
         e.preventDefault();
 
         if (!formData.currentPassword) {
-            alert("Please enter your current password to authorize changes.");
+            alert(t('profile.enterCurrentToAuthorize'));
             return;
         }
 
         if (formData.newPassword && formData.newPassword !== formData.confirmNewPassword) {
-            alert("New passwords do not match!");
+            alert(t('profile.passwordsDoNotMatch'));
             return;
         }
 
@@ -63,14 +65,14 @@ const ProfilePage = () => {
                 const updatedUser = await response.json();
                 setUser(updatedUser);
                 setShowModal(false);
-                alert("Profile updated successfully!");
+                alert(t('profile.profileUpdated'));
             } else {
                 const errorMsg = await response.text();
                 alert("Error: " + errorMsg);
             }
         } catch (err) {
             console.error("The error is actually:", err);
-            alert("Connection error. Please try again.");
+            alert(t('profile.connectionError'));
         } finally {
             setLoading(false);
         }
@@ -96,22 +98,22 @@ const ProfilePage = () => {
                             </div>
                             <div className="border-top pt-4 px-2">
                                 <div className="mb-3">
-                                    <label className="text-muted small fw-bold text-uppercase">Email</label>
+                                    <label className="text-muted small fw-bold text-uppercase">{t('profile.email')}</label>
                                     <p className="mb-0 fw-semibold">{user.email || 'N/A'}</p>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="text-muted small fw-bold text-uppercase">Phone</label>
+                                    <label className="text-muted small fw-bold text-uppercase">{t('profile.phone')}</label>
                                     <p className="mb-0 fw-semibold">{user.phone || 'N/A'}</p>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="text-muted small fw-bold text-uppercase">Preferred Language</label>
+                                    <label className="text-muted small fw-bold text-uppercase">{t('profile.preferredLanguage')}</label>
                                     <p className="mb-0 fw-semibold">{getLanguageDisplay(user.lang)}</p>
                                 </div>
                             </div>
                             <div className="mt-4">
                                 <button className="btn w-100 fw-bold text-white" style={{ backgroundColor: '#2D5A88' }}
                                         onClick={() => { setFormData({ ...user, currentPassword: '', newPassword: '', confirmNewPassword: '' }); setShowModal(true); }}>
-                                    Edit Profile Information
+                                    {t('profile.editProfile')}
                                 </button>
                             </div>
                         </div>
@@ -132,26 +134,26 @@ const ProfilePage = () => {
                             <form onSubmit={handleUpdate}>
                                 <div className="modal-body p-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
 
-                                    <h6 className="fw-bold mb-3" style={{ color: `#2D5A88` }}>General Information</h6>
+                                    <h6 className="fw-bold mb-3" style={{ color: `#2D5A88` }}>{t('profile.generalInfo')}</h6>
 
                                     <div className="row mb-3">
                                         <div className="col">
-                                            <label className="form-label small text-muted mb-1">First Name</label>
+                                            <label className="form-label small text-muted mb-1">{t('profile.firstName')}</label>
                                             <input type="text" name="firstName" className="form-control" value={formData.firstName} onChange={handleChange} required />
                                         </div>
                                         <div className="col">
-                                            <label className="form-label small text-muted mb-1">Last Name</label>
+                                            <label className="form-label small text-muted mb-1">{t('profile.lastName')}</label>
                                             <input type="text" name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} required />
                                         </div>
                                     </div>
 
                                     <div className="row mb-3">
                                         <div className="col">
-                                            <label className="form-label small text-muted mb-1">Email</label>
+                                            <label className="form-label small text-muted mb-1">{t('profile.email')}</label>
                                             <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
                                         </div>
                                         <div className="col">
-                                            <label className="form-label small text-muted mb-1">Phone</label>
+                                            <label className="form-label small text-muted mb-1">{t('profile.phone')}</label>
                                             <input type="text" name="phone" className="form-control" value={formData.phone || ''} onChange={handleChange} />
                                         </div>
                                     </div>
@@ -162,7 +164,7 @@ const ProfilePage = () => {
                                             <input type="url" name="photoUrl" className="form-control" value={formData.photoUrl} onChange={handleChange} />
                                         </div>
                                         <div className="col-4">
-                                            <label className="form-label small text-muted mb-1">Language</label>
+                                            <label className="form-label small text-muted mb-1">{t('profile.language')}</label>
                                             <select
                                                 name="lang"
                                                 className="form-select"
@@ -177,31 +179,31 @@ const ProfilePage = () => {
 
                                     <hr />
 
-                                    <h6 className="fw-bold mb-3" style={{ color: `#2D5A88` }}>Security & Passwords</h6>
+                                    <h6 className="fw-bold mb-3" style={{ color: `#2D5A88` }}>{t('profile.security')}</h6>
                                     <div className="p-3 bg-light rounded border mb-3">
-                                        <label className="form-label small fw-bold">Change Password<br></br>(leave blank to keep current password)</label>
+                                        <label className="form-label small fw-bold">{t('profile.changePassword')}<br></br>{t('profile.changePasswordHint')}</label>
                                         <input type="password" name="newPassword"
-                                               className="form-control mb-2" placeholder="New Password"
+                                               className="form-control mb-2" placeholder={t('profile.newPassword')}
                                                value={formData.newPassword} onChange={handleChange} />
                                         <input type="password" name="confirmNewPassword"
-                                               className="form-control" placeholder="Confirm New Password"
+                                               className="form-control" placeholder={t('profile.confirmNewPassword')}
                                                value={formData.confirmNewPassword} onChange={handleChange} />
                                     </div>
 
                                     <div className="mb-2">
-                                        <label className="form-label small fw-bold text-danger">Confirm Identity</label>
+                                        <label className="form-label small fw-bold text-danger">{t('profile.confirmIdentity')}</label>
                                         <input type="password" name="currentPassword"
                                                className="form-control border-danger"
-                                               placeholder="Enter Current Password to Save"
+                                               placeholder={t('profile.enterCurrentPassword')}
                                                value={formData.currentPassword} onChange={handleChange} required />
                                     </div>
 
                                 </div>
 
                                 <div className="modal-footer bg-light">
-                                    <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('profile.cancel')}</button>
                                     <button type="submit" className="btn text-white fw-bold" disabled={loading} style={{ backgroundColor: '#2D5A88' }}>
-                                        {loading ? 'Processing...' : 'Save Updates'}
+                                        {loading ? t('profile.processing') : t('profile.saveUpdates')}
                                     </button>
                                 </div>
                             </form>

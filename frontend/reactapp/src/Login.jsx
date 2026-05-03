@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import userStore from './stores/userStore';
 import { API_URL } from './config';
 import './Global.css';
@@ -33,6 +34,7 @@ async function request(loginData) {
 
 
 const LoginPage = () => {
+    const { t } = useTranslation();
 
     const [loginData, setFormData] = useState({ username: '', password: '' });
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -83,12 +85,12 @@ const LoginPage = () => {
             <div style={{ width: '100%', maxWidth: '420px' }}>
                 <div className="auth-card p-4 p-md-5">
 
-                    <h2 className="auth-title text-center mb-4">LOGIN</h2>
+                    <h2 className="auth-title text-center mb-4">{t('auth.loginTitle')}</h2>
 
                     <form onSubmit={handleLogin} className="login-form">
 
                         <div className="form-group mb-3">
-                            <label className="form-label">Username</label>
+                            <label className="form-label">{t('auth.username')}</label>
                             <input
                                 type="text"
                                 name="username"
@@ -100,7 +102,7 @@ const LoginPage = () => {
                         </div>
 
                         <div className="form-group mb-4">
-                            <label className="form-label">Password</label>
+                            <label className="form-label">{t('auth.password')}</label>
                             <input
                                 type="password"
                                 name="password"
@@ -112,12 +114,12 @@ const LoginPage = () => {
                         </div>
 
                         <button type="submit" disabled={isLoading} className="btn auth-button w-100">
-                            {isLoading ? 'Wait...' : 'Sign In'}
+                            {isLoading ? t('auth.wait') : t('auth.signIn')}
                         </button>
 
 
                         <div className="text-center mt-3">
-                            <Link to="/forgot-password">Forgot password?</Link>
+                            <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
                         </div>
 
                     </form>
