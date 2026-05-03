@@ -216,6 +216,34 @@ public class UserService {
     }
 
 
+    // --- UPDATE LANGUAGE
+
+    @PATCH
+    @Path("/language")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateLanguage(@HeaderParam("token") String token,
+                                   Map<String, String> payload) {
+
+        if (tokenBean.invalidToken(token)) {
+            return Response.status(400).entity("Invalid token.").build();
+        }
+
+        String lang = payload.get("lang");
+        if (lang == null || (!lang.equals("en") && !lang.equals("pt"))) {
+            return Response.status(400).entity("Invalid language.").build();
+        }
+
+        UserDto updated = userBean.updateLanguage(token, lang);
+
+        if (updated == null) {
+            return Response.status(400).entity("There was an error saving your language.").build();
+        }
+
+        return Response.status(200).entity(updated).build();
+    }
+
+
     //  --- CHECK MATCHING PASSWORDS
 
 //    @GET

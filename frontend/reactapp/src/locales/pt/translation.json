@@ -1,43 +1,41 @@
 {
   "navbar": {
     "menu": "Menu",
-    "dashboard": "Painel de Controle",
+    "dashboard": "Painel de Controlo",
     "clients": "Clientes",
-    "salesLeads": "Leads de Vendas",
+    "salesLeads": "Leads",
     "administration": "Administração",
-    "paperCompany": "Companhia de Papel, Inc.",
+    "paperCompany": "Paper Company, Inc.",
     "welcome": "Bem-vindo(a)",
     "employee": "Funcionário(a)",
-    "logout": "Sair",
     "notifications": "Notificações",
-    "noNotifs": "Nenhuma nova notificação",
-    "quote": "\"Bem-vindo! Eu acho que isso vai ser bom. Não vou dizer 'ótimo', porque não quero prometer demais.\""
+    "noNotifs": "Nenhuma nova notificação"
   },
   "auth": {
     "loginTitle": "ENTRAR",
-    "username": "Nome de Usuário",
-    "password": "Senha",
+    "username": "Nome de utilizador",
+    "password": "Palavra-passe",
     "signIn": "Entrar",
     "wait": "Aguarde...",
-    "forgotPassword": "Esqueceu a senha?",
-    "registerTitle": "REGISTRAR",
-    "newPassword": "NOVA SENHA",
+    "forgotPassword": "Recuperar palavra-passe",
+    "registerTitle": "REGISTAR",
+    "newPassword": "NOVA PALAVRA-PASSE",
     "confirmAccount": "CONFIRMAR CONTA",
     "firstName": "Nome",
-    "lastName": "Sobrenome",
-    "chooseUsername": "Escolha um Nome de Usuário",
+    "lastName": "Apelido",
+    "chooseUsername": "Escolha um nome de utilizador",
     "email": "E-mail",
     "phone": "Telefone",
     "photoUrl": "URL da Foto de Perfil",
-    "setPassword": "Definir Senha",
-    "confirmPassword": "Confirmar Senha",
-    "updatePassword": "Atualizar Senha",
+    "setPassword": "Definir palavra-passe",
+    "confirmPassword": "Confirmar palavra-passe",
+    "updatePassword": "Atualizar palavra-passe",
     "activateAccount": "Ativar Conta",
-    "processing": "Processando...",
+    "processing": "A processar...",
     "invalidLink": "Link Inválido",
-    "noSecurityToken": "Nenhum token de segurança encontrado. Por favor, solicite um novo link.",
+    "noSecurityToken": "Não foi encontrado token de segurança. Por favor, solicite um novo link.",
     "backToLogin": "Voltar ao Login",
-    "passwordsDoNotMatch": "As senhas não coincidem!"
+    "passwordsDoNotMatch": "As palavras-passe não coincidem!"
   },
   "profile": {
     "editProfile": "Editar Informações do Perfil",
@@ -47,20 +45,20 @@
     "editAccount": "Editar Conta",
     "generalInfo": "Informações Gerais",
     "firstName": "Nome",
-    "lastName": "Sobrenome",
+    "lastName": "Apelido",
     "language": "Idioma",
-    "security": "Segurança e Senhas",
-    "changePassword": "Alterar Senha",
-    "changePasswordHint": "(deixe em branco para manter a senha atual)",
-    "newPassword": "Nova Senha",
-    "confirmNewPassword": "Confirmar Nova Senha",
+    "security": "Segurança e Palavra-passe",
+    "changePassword": "Alterar palavra-passe",
+    "changePasswordHint": "(deixar em branco para manter a palavra-passe atual)",
+    "newPassword": "Nova Palavra-passe",
+    "confirmNewPassword": "Confirmar Nova Palavra-passe",
     "confirmIdentity": "Confirmar Identidade",
-    "enterCurrentPassword": "Insira a Senha Atual para Salvar",
+    "enterCurrentPassword": "Insira a Palavra-passe Atual para Guardar",
     "cancel": "Cancelar",
-    "saveUpdates": "Salvar Alterações",
-    "processing": "Processando...",
-    "passwordsDoNotMatch": "As novas senhas não coincidem!",
-    "enterCurrentToAuthorize": "Por favor, insira sua senha atual para autorizar as alterações.",
+    "saveUpdates": "Guardar Alterações",
+    "processing": "A processar...",
+    "passwordsDoNotMatch": "As novas palavras-passe não coincidem!",
+    "enterCurrentToAuthorize": "Por favor, insira a sua palavra-passe atual para autorizar as alterações.",
     "profileUpdated": "Perfil atualizado com sucesso!",
     "connectionError": "Erro de conexão. Por favor, tente novamente."
   },
@@ -69,20 +67,20 @@
     "noClients": "Nenhum cliente encontrado."
   },
   "leads": {
-    "title": "Leads de Vendas",
-    "noLeads": "Nenhum lead de vendas encontrado."
+    "title": "Leads",
+    "noLeads": "Nenhum lead encontrado."
   },
   "dashboard": {
-    "title": "Painel de Controle"
+    "title": "Painel de Controlo"
   },
   "adminStats": {
-    "totalUsers": "Total de Usuários",
+    "totalUsers": "Total de Utilizadores",
     "confirmedAccounts": "Contas Confirmadas",
     "totalClients": "Total de Clientes",
     "totalLeads": "Total de Leads",
-    "topReps": "Principais Representantes de Vendas (Clientes e Leads)",
+    "topReps": "Principais Representantes de Vendas (Clientes & Leads)",
     "leadsByState": "Leads por Estado",
-    "temporalEvolution": "Evolução Temporal (Clientes e Leads)"
+    "temporalEvolution": "Evolução Temporal (Clientes & Leads)"
   },
   "leadsPage": {
     "title": "Funil de Leads",
@@ -93,7 +91,7 @@
     "archive": "Arquivo",
     "won": "Ganho",
     "addNew": "+ Adicionar Novo Lead",
-    "loading": "Carregando Leads...",
+    "loading": "A carregar Leads...",
     "tableTitle": "Título",
     "tableDescription": "Descrição",
     "tableState": "Estado",
@@ -109,7 +107,7 @@
   "clientsPage": {
     "title": "Diretório de Clientes",
     "addNew": "+ Adicionar Novo Cliente",
-    "loading": "Carregando Clientes...",
+    "loading": "A carregar Clientes...",
     "tableName": "Nome",
     "tableCompany": "Empresa",
     "tableEmail": "E-mail",
@@ -125,8 +123,8 @@
   },
   "chatBox": {
     "chats": "Conversas",
-    "searchUsers": "Procurar usuários...",
+    "searchUsers": "Procurar utilizadores...",
     "clickToChat": "Clique para conversar",
-    "typeMessage": "Escreva..."
+    "typeMessage": "Escreva a sua mensagem aqui..."
   }
 }

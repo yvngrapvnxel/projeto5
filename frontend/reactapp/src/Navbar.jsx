@@ -137,7 +137,7 @@ const Navbar = () => {
                         <div className="d-flex flex-column align-items-end">
                             <span className="fw-semibold text-muted text-end"
                                   style={{ fontSize: '0.85rem', lineHeight: '1.2' }}>
-                                {t('navbar.quote')}
+                                Welcome! I think this is going to be good. I'm not gonna say 'great', because I don't want to overpromise.
                             </span>
                             <span className="text-secondary" style={{ fontSize: '0.7rem', marginTop: '2px' }}>
                                 — Michael Scott
@@ -205,7 +205,7 @@ const Navbar = () => {
                             </Link>
 
                             <button className="btn btn-sm btn-outline-danger" onClick={handleLogout}>
-                                {t('navbar.logout')} <i className="bi bi-box-arrow-right"></i>
+                                Logout <i className="bi bi-box-arrow-right"></i>
                             </button>
                         </div>
                     </div>

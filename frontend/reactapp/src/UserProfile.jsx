@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import userStore from './stores/userStore';
 import { API_URL } from './config';
 import './Global.css';
+import {t} from "i18next";
 
 const ProfilePage = () => {
     const { t } = useTranslation();
@@ -16,9 +17,38 @@ const ProfilePage = () => {
         confirmNewPassword: ''
     });
     const [loading, setLoading] = useState(false);
+    const [loadingLang, setLoadingLang] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleLanguageChange = async (newLang) => {
+        setLoadingLang(true);
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${API_URL}/users/language`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': token
+                },
+                body: JSON.stringify({ lang: newLang })
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                setUser(updatedUser);
+            } else {
+                const errorMsg = await response.text();
+                alert("Error updating language: " + errorMsg);
+            }
+        } catch (err) {
+            console.error("Language update error:", err);
+            alert(t('profile.connectionError'));
+        } finally {
+            setLoadingLang(false);
+        }
     };
 
     const handleUpdate = async (e) => {
@@ -78,12 +108,6 @@ const ProfilePage = () => {
         }
     };
 
-    // Helper to display friendly language name
-    const getLanguageDisplay = (langCode) => {
-        if (langCode === 'pt') return 'Portuguese (PT)';
-        return 'English (EN)';
-    };
-
     return (
         <div className="dashboard-container">
 
@@ -106,8 +130,16 @@ const ProfilePage = () => {
                                     <p className="mb-0 fw-semibold">{user.phone || 'N/A'}</p>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="text-muted small fw-bold text-uppercase">{t('profile.preferredLanguage')}</label>
-                                    <p className="mb-0 fw-semibold">{getLanguageDisplay(user.lang)}</p>
+                                    <label className="text-muted small fw-bold text-uppercase mb-2">{t('profile.preferredLanguage')}</label>
+                                    <select
+                                        className="form-select w-auto fw-semibold"
+                                        value={user.lang || 'en'}
+                                        onChange={(e) => handleLanguageChange(e.target.value)}
+                                        disabled={loadingLang}
+                                    >
+                                        <option value="en">English (EN)</option>
+                                        <option value="pt">Portuguese (PT)</option>
+                                    </select>
                                 </div>
                             </div>
                             <div className="mt-4">

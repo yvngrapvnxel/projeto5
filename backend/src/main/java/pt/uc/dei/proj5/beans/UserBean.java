@@ -188,6 +188,21 @@ public class UserBean implements Serializable {
     }
 
 
+    // --- UPDATE LANGUAGE
+
+    public UserDto updateLanguage(String token, String lang) {
+        UserEntity user = tokenDao.getTokensUser(token);
+        if (user == null) {
+            return null;
+        }
+
+        user.setLang(lang);
+        userDao.merge(user);
+
+        return fromEntityToDto(user);
+    }
+
+
     // --- CHECK MATCHING PASSWORDS
 
     public boolean passwordsDontMatch(String token, String password) {

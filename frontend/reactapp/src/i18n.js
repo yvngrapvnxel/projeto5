@@ -21,7 +21,7 @@ i18n
     lng: userStore.getState().user.lang || 'en', // Default language from store
     fallbackLng: 'en',
     interpolation: {
-      escapeValue: false, // react already safes from xss
+      escapeValue: false
     },
   });
 

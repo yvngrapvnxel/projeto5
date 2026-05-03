@@ -10,6 +10,7 @@
     "ajv": "^8.18.0",
     "ajv-keywords": "^5.1.0",
     "bootstrap-icons": "^1.13.1",
+    "i18next": "^26.0.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-i18next": "^17.0.6",

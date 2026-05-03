@@ -8,10 +8,8 @@
     "paperCompany": "Paper Company, Inc.",
     "welcome": "Welcome",
     "employee": "Employee",
-    "logout": "Logout",
     "notifications": "Notifications",
-    "noNotifs": "No new notifications",
-    "quote": "\"Welcome! I think this is going to be good. I'm not gonna say 'great', because I don't want to overpromise.\""
+    "noNotifs": "No new notifications"
   },
   "auth": {
     "loginTitle": "LOGIN",
@@ -127,6 +125,6 @@
     "chats": "Chats",
     "searchUsers": "Search users...",
     "clickToChat": "Click to chat",
-    "typeMessage": "Type..."
+    "typeMessage": "Type your message here..."
   }
 }
