@@ -7,9 +7,13 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @ServerEndpoint("/notifications/{ID}")
 public class NotificationEndpoint {
+
+    private static final Logger logger = LogManager.getLogger(NotificationEndpoint.class);
 
     // Map a User ID to a thread-safe Set of active Sessions
     private static final Map<Long, Set<Session>> activeSessions = new ConcurrentHashMap<>();
@@ -17,7 +21,7 @@ public class NotificationEndpoint {
     @OnOpen
     public void onOpen(Session session, @PathParam("ID") Long ID) {
         activeSessions.computeIfAbsent(ID, k -> ConcurrentHashMap.newKeySet()).add(session);
-        System.out.println("User connected. ID: " + ID + " | Session: " + session.getId());
+        logger.info("User connected. ID: " + ID + " | Session: " + session.getId());
     }
 
     @OnClose
@@ -29,12 +33,12 @@ public class NotificationEndpoint {
                 activeSessions.remove(ID);
             }
         }
-        System.out.println("User disconnected. ID: " + ID + " | Session: " + session.getId());
+        logger.info("User disconnected. ID: " + ID + " | Session: " + session.getId());
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        System.err.println("WebSocket error: " + throwable.getMessage());
+        logger.error("WebSocket error: " + throwable.getMessage(), throwable);
     }
 
     public static void sendNotification(Long id, String message) {

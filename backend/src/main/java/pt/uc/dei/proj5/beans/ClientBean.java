@@ -13,10 +13,14 @@ import pt.uc.dei.proj5.entity.UserEntity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 @Stateless
 public class ClientBean implements Serializable {
+
+    private static final Logger logger = LogManager.getLogger(ClientBean.class);
 
 
     @Inject
@@ -149,7 +153,7 @@ public class ClientBean implements Serializable {
             return false;
         }
 
-        System.out.println("client: " + client.getName());
+        logger.debug("Soft deleting client: " + client.getName());
 
         if (user.isAdmin() || client.getUser().getId().equals(user.getId())) {
             return clientDao.softDeleteClient(ID);

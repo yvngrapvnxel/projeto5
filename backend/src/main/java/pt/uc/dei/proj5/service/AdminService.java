@@ -18,9 +18,13 @@ import pt.uc.dei.proj5.entity.UserEntity;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Path("/admin")
 public class AdminService {
+
+    private static final Logger logger = LogManager.getLogger(AdminService.class);
 
     @Inject
     AdminBean adminBean;
@@ -78,6 +82,7 @@ public class AdminService {
 
         boolean sent = adminBean.sendEmail(email, subject, body);
 
+        logger.info("Admin {} sent invitation to {}", admin.getUsername(), email);
         return Response.ok("Invitation sent to " + email).build();
     }
 
@@ -156,9 +161,11 @@ public class AdminService {
         boolean reactivated = adminBean.reactivateUser(ID);
 
         if (reactivated) {
+            logger.info("Admin {} reactivated user ID {}", admin.getUsername(), ID);
             return Response.status(200).entity("User reactivated successfully.").build();
         }
 
+        logger.warn("Admin {} failed to reactivate user ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("User profile not found.").build();
     }
 
@@ -186,15 +193,18 @@ public class AdminService {
         if (permanent) {
             boolean deleted = adminBean.hardDeleteUser(ID);
             if (deleted) {
+                logger.info("Admin {} permanently deleted user ID {}", admin.getUsername(), ID);
                 return Response.status(204).entity("User permanently deleted.").build();
             }
         } else {
             boolean inactive = adminBean.softDeleteUser(ID);
             if (inactive) {
+                logger.info("Admin {} soft deleted user ID {}", admin.getUsername(), ID);
                 return Response.status(200).entity("User is now inactive.").build();
             }
         }
 
+        logger.warn("Admin {} failed to delete user ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("User profile not found.").build();
     }
 
@@ -258,9 +268,11 @@ public class AdminService {
         boolean active = adminBean.reactivateClient(ID);
 
         if (active) {
+            logger.info("Admin {} reactivated client ID {}", admin.getUsername(), ID);
             return Response.status(200).entity("Client is now active.").build();
         }
 
+        logger.warn("Admin {} failed to reactivate client ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("Client not found.").build();
     }
 
@@ -293,9 +305,11 @@ public class AdminService {
         ClientDto updated = clientBean.editClient(admin, ID, newData);
 
         if (updated != null) {
+            logger.info("Admin {} edited client ID {}", admin.getUsername(), ID);
             return Response.status(200).entity(updated).build();
         }
 
+        logger.warn("Admin {} failed to edit client ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("Client not found.").build();
     }
 
@@ -329,10 +343,12 @@ public class AdminService {
         }
 
         if (deleted) {
+            logger.info("Admin {} {} deleted client ID {}", admin.getUsername(), permanent ? "permanently" : "soft", ID);
             String message = permanent ? "Client permanently deleted." : "Client is now inactive.";
             return Response.status(204).entity(message).build();
         }
 
+        logger.warn("Admin {} failed to delete client ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("Client not found").build();
 
     }
@@ -401,9 +417,11 @@ public class AdminService {
         LeadDto updated = leadBean.editLead(admin, ID, newData);
 
         if (updated != null) {
+            logger.info("Admin {} edited lead ID {}", admin.getUsername(), ID);
             return Response.status(200).entity(updated).build();
         }
 
+        logger.warn("Admin {} failed to edit lead ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("Lead not found.").build();
     }
 
@@ -428,9 +446,11 @@ public class AdminService {
         boolean reactivated = adminBean.reactivateLead(ID);
 
         if (reactivated) {
+            logger.info("Admin {} reactivated lead ID {}", admin.getUsername(), ID);
             return Response.status(200).entity("Lead is now active.").build();
         }
 
+        logger.warn("Admin {} failed to reactivate lead ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("Lead not found.").build();
     }
 
@@ -465,10 +485,12 @@ public class AdminService {
         }
 
         if (deleted) {
+            logger.info("Admin {} {} deleted lead ID {}", admin.getUsername(), permanent ? "permanently" : "soft", ID);
             String message = permanent ? "Lead permanently deleted." : "Lead is now inactive.";
             return Response.status(204).entity(message).build();
         }
 
+        logger.warn("Admin {} failed to delete lead ID {}", admin.getUsername(), ID);
         return Response.status(404).entity("Lead not found").build();
     }
 }

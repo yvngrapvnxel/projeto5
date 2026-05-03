@@ -13,10 +13,14 @@ import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 @Path("/clients")
 public class ClientService {
+
+    private static final Logger logger = LogManager.getLogger(ClientService.class);
 
 
     @Inject
@@ -62,10 +66,13 @@ public class ClientService {
             // tenta registar o cliente, verifica tb se nome+empresa já existe
             ClientDto newClient = clientBean.newClient(newData, token);
             if (newClient == null) {
+                logger.warn("Failed to add client: Company's Client already registered.");
                 return Response.status(400).entity("This Company's Client is already registered.").build();
             }
+            logger.info("Added new client successfully: ID {}", newClient.getId());
             return Response.status(201).entity(newClient).build();
         } catch (Exception e) {
+            logger.error("Error adding client: {}", e.getMessage(), e);
             return Response.status(409).entity(e.getMessage()).build();
         }
     }
@@ -129,9 +136,11 @@ public class ClientService {
         ClientDto updated = clientBean.editClient(user, ID, newData);
 
         if (updated != null) {
+            logger.info("Updated client successfully: ID {}", ID);
             return Response.status(200).entity(updated).build();
         }
 
+        logger.warn("Failed to edit client: Not found or unauthorized for ID {}", ID);
         return Response.status(401).entity("Client not found.").build();
     }
 
@@ -157,9 +166,11 @@ public class ClientService {
         boolean inactive = clientBean.softDeleteClient(user, ID);
 
         if (inactive) {
+            logger.info("Soft deleted client successfully: ID {}", ID);
             return Response.status(200).entity("Client is now inactive.").build();
         }
 
+        logger.warn("Failed to soft delete client: Already inactive or not found for ID {}", ID);
         return Response.status(404).entity("Client already inactive or not found. ID: " + ID).build();
     }
 

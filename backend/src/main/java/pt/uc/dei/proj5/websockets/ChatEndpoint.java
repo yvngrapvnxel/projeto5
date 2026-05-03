@@ -16,9 +16,13 @@ import pt.uc.dei.proj5.dao.AdminDao;
 import pt.uc.dei.proj5.dao.MessageDao;
 import pt.uc.dei.proj5.entity.MessageEntity;
 import pt.uc.dei.proj5.entity.UserEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @ServerEndpoint("/chat/{id}")
 public class ChatEndpoint {
+
+    private static final Logger logger = LogManager.getLogger(ChatEndpoint.class);
 
     @Inject
     private AdminDao adminDao;
@@ -36,7 +40,7 @@ public class ChatEndpoint {
     public void onOpen(Session session, @PathParam("id") Long senderID) {
         // Create the Set if it doesn't exist, then add the new tab's session
         chatSessions.computeIfAbsent(senderID, k -> ConcurrentHashMap.newKeySet()).add(session);
-        System.out.println("User joined chat. ID: " + senderID + " | Session: " + session.getId());
+        logger.info("User joined chat. ID: " + senderID + " | Session: " + session.getId());
     }
 
     @OnClose
@@ -48,17 +52,17 @@ public class ChatEndpoint {
                 chatSessions.remove(senderID);
             }
         }
-        System.out.println("User left chat. ID: " + senderID + " | Session: " + session.getId());
+        logger.info("User left chat. ID: " + senderID + " | Session: " + session.getId());
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        System.err.println("Chat WebSocket error: " + throwable.getMessage());
+        logger.error("Chat WebSocket error: " + throwable.getMessage(), throwable);
     }
 
     @OnMessage
     public void onMessage(String jsonMessage, @PathParam("id") Long senderID) {
-        System.out.println("WS Received from " + senderID + ": " + jsonMessage);
+        logger.debug("WS Received from " + senderID + ": " + jsonMessage);
 
         try (JsonReader reader = Json.createReader(new StringReader(jsonMessage))) {
             JsonObject incomingJson = reader.readObject();
@@ -78,12 +82,12 @@ public class ChatEndpoint {
             }
 
             if (receiverID == null) {
-                System.out.println("Abort: No valid receiver ID found.");
+                logger.warn("Abort: No valid receiver ID found.");
                 return;
             }
 
             if ("READ".equalsIgnoreCase(type != null ? type.trim() : "")) {
-                System.out.println("Processing READ receipt. Updater: " + senderID + ", Target: " + receiverID);
+                logger.debug("Processing READ receipt. Updater: " + senderID + ", Target: " + receiverID);
 
                 messageDao.markMessagesAsRead(senderID, receiverID);
 
@@ -101,12 +105,12 @@ public class ChatEndpoint {
                         }
                     }
                 } else {
-                    System.out.println("Target session " + receiverID + " is offline. Skipping real-time forward.");
+                    logger.debug("Target session " + receiverID + " is offline. Skipping real-time forward.");
                 }
 
             } else {
                 if (!incomingJson.containsKey("text") || incomingJson.isNull("text")) {
-                    System.out.println("Abort: Normal message received but no 'text' field was found.");
+                    logger.warn("Abort: Normal message received but no 'text' field was found.");
                     return;
                 }
                 String text = incomingJson.getString("text");
@@ -147,8 +151,7 @@ public class ChatEndpoint {
             }
 
         } catch (Exception e) {
-            System.err.println("Error processing chat message: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error processing chat message: " + e.getMessage(), e);
         }
     }
 
@@ -171,9 +174,9 @@ public class ChatEndpoint {
                         s.getBasicRemote().sendText(outgoingJson.toString());
                     }
                 }
-                System.out.println("REST explicitly pushed message to WS sessions of user: " + receiverId);
+                logger.debug("REST explicitly pushed message to WS sessions of user: " + receiverId);
             } catch (Exception e) {
-                System.err.println("Failed to push real-time message from REST: " + e.getMessage());
+                logger.error("Failed to push real-time message from REST: " + e.getMessage(), e);
             }
         }
     }

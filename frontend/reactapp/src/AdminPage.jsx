@@ -2,9 +2,11 @@ import React, {useEffect, useState} from 'react';
 import useUserStore from './stores/userStore';
 import useAdminStore from './stores/adminStore';
 import {CRMModal} from './components/edit-modal';
+import { useTranslation } from 'react-i18next';
 
 
 const AdminPage = () => {
+    const { t } = useTranslation();
     const {user: currentUser} = useUserStore();
     const {
         users, fetchUsers, deleteUser, reactivateUser,
@@ -54,11 +56,11 @@ const AdminPage = () => {
         if (type === 'invite') {
             success = await inviteUser(formData.email);
             if (success) {
-                alert("Invitation sent successfully to " + formData.email);
+                alert(t('adminPage.inviteSuccess') + formData.email);
                 handleModalClose();
                 await fetchUsers(); // Refresh the list to show the new inactive user
             } else {
-                alert("Failed to send invitation. User may already exist.");
+                alert(t('adminPage.inviteFailed'));
             }
             return;
         } else if (type === 'client') {
@@ -73,35 +75,35 @@ const AdminPage = () => {
                 fetchUserSubData(expandedUserId);
             }
         } else {
-            alert("Failed to update " + type);
+            alert(t('adminPage.updateFailed') + type);
         }
     };
 
     const getModalFields = () => {
         if (modalConfig.type === 'invite') {
             return [
-                {name: 'email', label: 'Email Address', type: 'email'}
+                {name: 'email', label: t('adminPage.emailAddress'), type: 'email'}
             ];
         } else if (modalConfig.type === 'client') {
             return [
-                {name: 'name', label: 'Name', type: 'text'},
-                {name: 'company', label: 'Company', type: 'text'},
-                {name: 'email', label: 'Email', type: 'email'}
+                {name: 'name', label: t('adminPage.clientName'), type: 'text'},
+                {name: 'company', label: t('adminPage.clientCompany'), type: 'text'},
+                {name: 'email', label: t('adminPage.email'), type: 'email'}
             ];
         } else if (modalConfig.type === 'lead') {
             return [
-                {name: 'title', label: 'Title', type: 'text'},
-                {name: 'description', label: 'Description', type: 'textarea'},
+                {name: 'title', label: t('adminPage.leadTitle'), type: 'text'},
+                {name: 'description', label: t('adminPage.leadDescription'), type: 'textarea'},
                 {
                     name: 'state',
-                    label: 'State',
+                    label: t('adminPage.leadState'),
                     type: 'select',
                     options: [
-                        {value: 0, label: 'New'},
-                        {value: 1, label: 'Under Review'},
-                        {value: 2, label: 'Proposal Sent'},
-                        {value: 3, label: 'Archived'},
-                        {value: 4, label: 'Won'}
+                        {value: 0, label: t('adminPage.stateNew')},
+                        {value: 1, label: t('adminPage.stateUnderReview')},
+                        {value: 2, label: t('adminPage.stateProposalSent')},
+                        {value: 3, label: t('adminPage.stateArchive')},
+                        {value: 4, label: t('adminPage.stateWon')}
                     ]
                 }
             ];
@@ -141,7 +143,7 @@ const AdminPage = () => {
     if (!currentUser.admin) {
         return (
             <div className="container-forbidden d-flex justify-content-center align-items-center">
-                <h1 className="text-white fw-bold bg-danger p-3 rounded shadow-sm">403 - Forbidden</h1>
+                <h1 className="text-white fw-bold bg-danger p-3 rounded shadow-sm">{t('adminPage.forbidden')}</h1>
             </div>
         );
     }
@@ -150,7 +152,7 @@ const AdminPage = () => {
         <div className="dashboard-container">
             <div className="container py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2 className="fw-bold mb-0">System Administration</h2>
+                    <h2 className="fw-bold mb-0">{t('adminPage.title')}</h2>
                     <button
                         className="btn btn-primary"
                         style={{backgroundColor: '#2D5A88'}}
@@ -159,7 +161,7 @@ const AdminPage = () => {
                             setModalConfig({show: true, type: 'invite', item: null});
                         }}
                     >
-                        + Invite User
+                        {t('adminPage.inviteUser')}
                     </button>
                 </div>
 
@@ -168,9 +170,9 @@ const AdminPage = () => {
                         <table className="table table-hover mb-0 align-middle">
                             <thead className="table-light">
                             <tr>
-                                <th className="border-0 px-4 py-3">User</th>
-                                <th className="border-0 py-3">Status</th>
-                                <th className="border-0 py-3 text-end px-4">Actions</th>
+                                <th className="border-0 px-4 py-3">{t('adminPage.tableUser')}</th>
+                                <th className="border-0 py-3">{t('adminPage.tableStatus')}</th>
+                                <th className="border-0 py-3 text-end px-4">{t('adminPage.tableActions')}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -203,7 +205,7 @@ const AdminPage = () => {
                                         <td className="py-3">
                                             <span className={`badge ${u.active ? 'bg-success' : 'bg-danger'}`}
                                                   style={{fontSize: '0.65rem'}}>
-                                                {u.active ? 'Active' : 'Inactive'}
+                                                {u.active ? t('adminPage.statusActive') : t('adminPage.statusInactive')}
                                             </span>
                                         </td>
                                         <td className="py-3 text-end px-4">
@@ -213,14 +215,14 @@ const AdminPage = () => {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     if (u.active) {
-                                                        if (window.confirm(`Deactivate ${u.firstName}?`)) deleteUser(u.id, false);
+                                                        if (window.confirm(t('adminPage.confirmDeactivateUser', { name: u.firstName }))) deleteUser(u.id, false);
                                                     } else {
                                                         reactivateUser(u.id);
                                                     }
                                                 }}
                                             >
                                                 <span
-                                                    style={{marginTop: '1px'}}>{u.active ? 'Deactivate' : 'Reactivate'}</span>
+                                                    style={{marginTop: '1px'}}>{u.active ? t('adminPage.actionDeactivate') : t('adminPage.actionReactivate')}</span>
                                             </button>
                                         </td>
                                     </tr>
@@ -236,24 +238,24 @@ const AdminPage = () => {
                                                     <div className="card border-0 shadow-sm mb-4">
                                                         <div
                                                             className="card-header bg-white fw-bold text-secondary small uppercase pt-3 border-bottom-0">
-                                                            <i className="bi bi-person-vcard me-2"></i> Account Details
+                                                            <i className="bi bi-person-vcard me-2"></i> {t('adminPage.accountDetails')}
                                                         </div>
                                                         <div className="card-body pt-0">
                                                             <table className="table table-sm table-hover mb-0">
                                                                 <thead className="table-light">
                                                                 <tr className="text-muted" style={{fontSize: '0.7rem'}}>
-                                                                    <th>Email</th>
-                                                                    <th>Phone</th>
-                                                                    <th>Role</th>
-                                                                    <th>Status</th>
+                                                                    <th>{t('adminPage.email')}</th>
+                                                                    <th>{t('adminPage.phone')}</th>
+                                                                    <th>{t('adminPage.role')}</th>
+                                                                    <th>{t('adminPage.tableStatus')}</th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                 <tr style={{fontSize: '0.85rem'}}>
                                                                     <td>{u.email}</td>
                                                                     <td>{u.phone || 'N/A'}</td>
-                                                                    <td>{u.admin ? 'Administrator' : 'Standard User'}</td>
-                                                                    <td>{u.active ? 'Active' : 'Deactivated'}</td>
+                                                                    <td>{u.admin ? t('adminPage.roleAdmin') : t('adminPage.roleStandard')}</td>
+                                                                    <td>{u.active ? t('adminPage.statusActive') : t('adminPage.statusDeactivated')}</td>
                                                                 </tr>
                                                                 </tbody>
                                                             </table>
@@ -268,7 +270,7 @@ const AdminPage = () => {
                                                             <div className="card border-0 shadow-sm h-100">
                                                                 <div
                                                                     className="card-header bg-white fw-bold border-bottom-0 pt-4"
-                                                                    style={{color: '#2D5A88'}}>User's Clients
+                                                                    style={{color: '#2D5A88'}}>{t('adminPage.usersClients')}
                                                                 </div>
                                                                 <div className="card-body pt-0">
                                                                     {sortedSelectedClients.length > 0 ? sortedSelectedClients.map(c => (
@@ -283,7 +285,7 @@ const AdminPage = () => {
                                                                                 <button
                                                                                     className="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
                                                                                     onClick={() => openEditModal(c, 'client')}>
-                                                                                    Edit
+                                                                                    {t('adminPage.actionEdit')}
                                                                                 </button>
 
                                                                                 <button
@@ -296,7 +298,7 @@ const AdminPage = () => {
                                                                                         }
                                                                                     }}
                                                                                 >
-                                                                                    {c.active ? 'Deactivate' : 'Reactivate'}
+                                                                                    {c.active ? t('adminPage.actionDeactivate') : t('adminPage.actionReactivate')}
                                                                                 </button>
 
                                                                                 <i
@@ -307,15 +309,14 @@ const AdminPage = () => {
                                                                                         opacity: '0.5'
                                                                                     }}
                                                                                     onClick={() => {
-                                                                                        if (window.confirm(`PERMANENTLY DELETE "${c.name}"? This cannot be undone.`)) {
+                                                                                        if (window.confirm(t('adminPage.permanentlyDelete', { name: c.name }))) {
                                                                                             deleteClient(c.id, true);
                                                                                         }
                                                                                     }}
                                                                                 ></i>
                                                                             </div>
                                                                         </div>
-                                                                    )) : <p className="text-muted small mt-2">No clients
-                                                                        found.</p>}
+                                                                    )) : <p className="text-muted small mt-2">{t('adminPage.noClientsFound')}</p>}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -327,18 +328,18 @@ const AdminPage = () => {
                                                                 <div
                                                                     className="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 pt-3">
                                                                     <span className="fw-bold"
-                                                                          style={{color: '#2D5A88'}}>User's Leads</span>
+                                                                          style={{color: '#2D5A88'}}>{t('adminPage.usersLeads')}</span>
                                                                     {selectedUserLeads.length > 0 ?
                                                                         <select
                                                                             className="form-select form-select-sm w-auto"
                                                                             value={leadFilter}
                                                                             onChange={(e) => setLeadFilter(e.target.value)}>
-                                                                            <option value="all">All</option>
-                                                                            <option value="0">New</option>
-                                                                            <option value="1">Under Review</option>
-                                                                            <option value="2">Proposal Sent</option>
-                                                                            <option value="3">Archive</option>
-                                                                            <option value="4">Won</option>
+                                                                            <option value="all">{t('adminPage.filterAll')}</option>
+                                                                            <option value="0">{t('adminPage.stateNew')}</option>
+                                                                            <option value="1">{t('adminPage.stateUnderReview')}</option>
+                                                                            <option value="2">{t('adminPage.stateProposalSent')}</option>
+                                                                            <option value="3">{t('adminPage.stateArchive')}</option>
+                                                                            <option value="4">{t('adminPage.stateWon')}</option>
                                                                         </select>
                                                                         : <></>}
                                                                 </div>
@@ -356,7 +357,7 @@ const AdminPage = () => {
                                                                                 <span
                                                                                     className="badge border text-muted fw-normal"
                                                                                     style={{fontSize: '0.65rem'}}>
-                                                                                    {["New", "Under Review", "Proposal Sent", "Archive", "Won"][l.state]}
+                                                                                    {[t('adminPage.stateNew'), t('adminPage.stateUnderReview'), t('adminPage.stateProposalSent'), t('adminPage.stateArchive'), t('adminPage.stateWon')][l.state]}
                                                                                 </span>
                                                                             </div>
                                                                             <div className="text-end"
@@ -364,7 +365,7 @@ const AdminPage = () => {
                                                                                 <button
                                                                                     className="btn btn-sm btn-link text-secondary p-0 me-2 text-decoration-none"
                                                                                     onClick={() => openEditModal(l, 'lead')}>
-                                                                                    Edit
+                                                                                    {t('adminPage.actionEdit')}
                                                                                 </button>
 
                                                                                 <button
@@ -377,7 +378,7 @@ const AdminPage = () => {
                                                                                         }
                                                                                     }}
                                                                                 >
-                                                                                    {l.active ? 'Deactivate' : 'Reactivate'}
+                                                                                    {l.active ? t('adminPage.actionDeactivate') : t('adminPage.actionReactivate')}
                                                                                 </button>
 
                                                                                 <i
@@ -389,15 +390,14 @@ const AdminPage = () => {
                                                                                     }}
                                                                                     title="Permanent Delete"
                                                                                     onClick={() => {
-                                                                                        if (window.confirm(`PERMANENTLY DELETE "${l.title}"? This cannot be undone.`)) {
+                                                                                        if (window.confirm(t('adminPage.permanentlyDelete', { name: l.title }))) {
                                                                                             deleteLead(l.id, true);
                                                                                         }
                                                                                     }}
                                                                                 ></i>
                                                                             </div>
                                                                         </div>
-                                                                    )) : <p className="text-muted small mt-2">No leads
-                                                                        found.</p>}
+                                                                    )) : <p className="text-muted small mt-2">{t('adminPage.noLeadsFound')}</p>}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -418,8 +418,8 @@ const AdminPage = () => {
                     onClose={handleModalClose}
                     onSubmit={handleModalSubmit}
                     title={
-                        modalConfig.type === 'invite' ? 'Invite New User' :
-                            modalConfig.type === 'client' ? 'Edit Client' : 'Edit Lead'
+                        modalConfig.type === 'invite' ? t('adminPage.inviteTitle') :
+                            modalConfig.type === 'client' ? t('adminPage.editClientTitle') : t('adminPage.editLeadTitle')
                     }
                     formData={formData}
                     setFormData={setFormData}

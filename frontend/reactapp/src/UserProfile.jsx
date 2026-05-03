@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import userStore from './stores/userStore';
 import { API_URL } from './config';
 import './Global.css';
-import {t} from "i18next";
 
 const ProfilePage = () => {
     const { t } = useTranslation();

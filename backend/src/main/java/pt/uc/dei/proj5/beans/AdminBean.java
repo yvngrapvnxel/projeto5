@@ -10,6 +10,8 @@ import pt.uc.dei.proj5.entity.ClientEntity;
 import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.LeadEntity;
 import pt.uc.dei.proj5.entity.UserEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +20,8 @@ import java.util.Properties;
 
 @Stateless
 public class AdminBean implements Serializable {
+
+    private static final Logger logger = LogManager.getLogger(AdminBean.class);
 
     @Inject
     AdminDao adminDao;
@@ -210,12 +214,11 @@ public class AdminBean implements Serializable {
             Transport.send(message);
 
 
-            System.out.println("E-mail successfully sent to: " + receiver);
+            logger.info("E-mail successfully sent to: " + receiver);
             return true;
 
         } catch (Exception e) {
-            System.err.println("Error sending e-mail to: " + receiver);
-            e.printStackTrace();
+            logger.error("Error sending e-mail to: " + receiver, e);
             return false;
         }
     }

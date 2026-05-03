@@ -15,12 +15,16 @@ import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 //test
 
 
 @Path("/leads")
 public class LeadService {
+
+    private static final Logger logger = LogManager.getLogger(LeadService.class);
 
 
     @Inject
@@ -66,8 +70,10 @@ public class LeadService {
             OwnerDto owner = new OwnerDto(u.getId(), u.getUsername(), u.isAdmin());
             newData.setUser(owner);
             LeadDto lead = leadBean.createLead(newData);
+            logger.info("Added new lead successfully: ID {}", lead.getId());
             return Response.status(201).entity(lead).build();
         } catch (Exception e) {
+            logger.error("Error adding lead: {}", e.getMessage(), e);
             return Response.status(409).entity(e.getMessage()).build();
         }
     }
@@ -126,9 +132,11 @@ public class LeadService {
         LeadDto updated = leadBean.editLead(user, ID, newData);
 
         if (updated != null) {
+            logger.info("Updated lead successfully: ID {}", ID);
             return Response.status(200).entity(updated).build();
         }
 
+        logger.warn("Failed to edit lead: Unauthorized or not found for ID {}", ID);
         return Response.status(403).entity("Forbidden.").build();
     }
 
@@ -154,9 +162,11 @@ public class LeadService {
         boolean inactive = leadBean.softDeleteLead(user, ID);
 
         if (inactive) {
+            logger.info("Soft deleted lead successfully: ID {}", ID);
             return Response.status(200).entity("Lead is now inactive.").build();
         }
 
+        logger.warn("Failed to soft delete lead: Already inactive or not found for ID {}", ID);
         return Response.status(404).entity("Lead already inactive or not found. ID: " + ID).build();
     }
 

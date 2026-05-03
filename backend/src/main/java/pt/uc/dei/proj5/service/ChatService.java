@@ -21,9 +21,13 @@ import pt.uc.dei.proj5.websockets.NotificationEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Path("/chat")
 public class ChatService {
+
+    private static final Logger logger = LogManager.getLogger(ChatService.class);
 
     @Inject
     private UserDao userDao;
@@ -157,8 +161,7 @@ public class ChatService {
             return Response.status(Response.Status.OK).entity("Message sent successfully.").build();
 
         } catch (Exception e) {
-            System.err.println("REST Error sending message: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("REST Error sending message: " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to send message.").build();
         }
     }

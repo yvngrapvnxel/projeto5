@@ -11,10 +11,14 @@ import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 @Path("/users")
 public class UserService {
+
+    private static final Logger logger = LogManager.getLogger(UserService.class);
 
 
     @Inject
@@ -43,6 +47,7 @@ public class UserService {
 
         // validação de campos vazios
         if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
+            logger.warn("Login failed: Incomplete data for username: {}", username);
             return Response.status(401).entity("Incomplete data.").build();
         }
 
@@ -50,8 +55,11 @@ public class UserService {
         String token = userBean.authenticate(username, password);
 
         if (token == null) {
+            logger.warn("Login failed: Incorrect data for username: {}", username);
             return Response.status(401).entity("Incorrect data.").build();
         }
+
+        logger.info("User {} logged in successfully", username);
 
         // devolve o token ao frontend em formato JSON
 //        Map<String, String> mapaToken = Map.of("token", token);
@@ -66,6 +74,7 @@ public class UserService {
     @Path("/logout")
     public Response logout(@HeaderParam("token") String token) {
         userBean.logout(token);
+        logger.info("User logged out");
         return Response.status(200).entity("Logged out successfully.").build();
     }
 
@@ -104,9 +113,11 @@ public class UserService {
         boolean success = userBean.confirmAccount(payload);
 
         if (!success) {
+            logger.warn("Account confirmation failed: Invalid or expired token for email: {}", email);
             return Response.status(400).entity("Invalid or expired invitation token.").build();
         }
 
+        logger.info("Account confirmed successfully for user: {}", newUsername);
         return Response.status(200).entity("Account confirmed successfully!").build();
     }
 
@@ -150,9 +161,11 @@ public class UserService {
         boolean success = userBean.resetPassword(token, newPassword);
 
         if (!success) {
+            logger.warn("Password reset failed: Invalid or expired token");
             return Response.status(400).entity("Invalid or expired reset token.").build();
         }
 
+        logger.info("Password reset successfully");
         return Response.status(200).entity("Password updated successfully.").build();
     }
 
@@ -209,9 +222,11 @@ public class UserService {
         UserDto updated = userBean.updateUser(token, dadosNovos);
 
         if (updated == null) {
+            logger.warn("Profile update failed for user");
             return Response.status(401).entity("There was an error saving your profile.").build();
         }
 
+        logger.info("Profile updated successfully for user");
         return Response.status(200).entity(updated).build();
     }
 
@@ -237,9 +252,11 @@ public class UserService {
         UserDto updated = userBean.updateLanguage(token, lang);
 
         if (updated == null) {
+            logger.warn("Language update failed for user");
             return Response.status(400).entity("There was an error saving your language.").build();
         }
 
+        logger.info("Language updated to {} for user", lang);
         return Response.status(200).entity(updated).build();
     }
 
