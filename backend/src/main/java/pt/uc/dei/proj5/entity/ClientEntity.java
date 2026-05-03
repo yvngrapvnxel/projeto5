@@ -3,11 +3,13 @@ package pt.uc.dei.proj5.entity;
 
 import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 
 @Entity
@@ -41,6 +43,10 @@ public class ClientEntity implements Serializable {
 
     @Column(name = "isActive", nullable = false)
     private boolean isActive;
+
+    @CreationTimestamp
+    @Column(name = "creationDate", nullable = false, updatable = false)
+    private LocalDate creationDate;
 
     @ManyToOne
     @JoinColumn(name = "userId") // FK

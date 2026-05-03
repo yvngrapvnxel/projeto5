@@ -739,3 +739,36 @@ body.no-bg .dashboard-container {
 .recharts-surface:focus {
   outline: none !important;
 }
+
+/* --- DASHBOARD LAYOUT --- */
+.dashboard-main-content {
+  padding: 20px;
+  margin-top: 70px;
+}
+
+/* --- DUNDER MIFFLIN TYPOGRAPHY & COLORS --- */
+.text-dunder-dark {
+  color: #2C313C;
+  font-weight: bold;
+}
+
+.text-dunder-blue {
+  color: #3C78B4;
+  font-weight: bold;
+}
+
+.text-dunder-dark-blue {
+  color: #2D5A88;
+  font-weight: bold;
+}
+
+/* Custom weights for Bootstrap's default text colors */
+.text-success-bold {
+  color: #198754; /* Standard Bootstrap success green */
+  font-weight: bold;
+}
+
+.text-warning-bold {
+  color: #ffc107; /* Standard Bootstrap warning yellow */
+  font-weight: bold;
+}

@@ -1,32 +1,58 @@
 import React, { useMemo } from 'react';
 import {
     PieChart, Pie, Cell, Tooltip, Legend,
-    LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer
+    LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer,
+    BarChart, Bar
 } from 'recharts';
 import '../Global.css';
 
-// Colors for the Donut Chart (Updated to fit 5 distinct states)
 const COLORS = ['#3C78B4', '#F6A623', '#5D9CEC', '#9B9B9B', '#7ED321'];
 
 const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
 
-    // --- 1. KPI CALCULATIONS ---
     const totalUsers = users.length;
     const totalClients = clients.length;
     const totalLeads = leads.length;
     const confirmedAccounts = users.filter(user => user.active).length;
 
-    // --- 2. LEADS BY STATE (Donut) ---
+    const topPerformers = useMemo(() => {
+
+        const performData = users.map(user => {
+            // We use == instead of === so it matches strings to numbers safely
+            const userLeads = leads.filter(l =>
+                l.userId == user.id ||
+                l.user?.id == user.id ||
+                l.users?.id == user.id ||
+                l.owner?.id == user.id ||
+                l.ownerId == user.id
+            ).length;
+
+            const userClients = clients.filter(c =>
+                c.userId == user.id ||
+                c.user?.id == user.id ||
+                c.users?.id == user.id ||
+                c.owner?.id == user.id ||
+                c.ownerId == user.id
+            ).length;
+
+            const displayName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username;
+
+            return {
+                name: displayName,
+                Leads: userLeads,
+                Clients: userClients,
+                Total: userLeads + userClients
+            };
+        });
+
+        return performData
+            .filter(u => u.Total > 0)
+            .sort((a, b) => b.Total - a.Total)
+            .slice(0, 5);
+    }, [users, clients, leads]);
+
     const leadsByState = useMemo(() => {
-        // Updated with your actual state labels
-        const stateCounts = {
-            "New": 0,
-            "Under Review": 0,
-            "Proposal Sent": 0,
-            "Archive": 0,
-            "Won": 0,
-            "Unknown": 0
-        };
+        const stateCounts = { "New": 0, "Under Review": 0, "Proposal Sent": 0, "Archive": 0, "Won": 0, "Unknown": 0 };
 
         leads.forEach(lead => {
             if (lead.state === 0) stateCounts["New"] += 1;
@@ -38,15 +64,13 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
         });
 
         return Object.keys(stateCounts)
-            .filter(key => stateCounts[key] > 0) // Only show states that actually have leads
+            .filter(key => stateCounts[key] > 0)
             .map(key => ({ name: key, value: stateCounts[key] }));
     }, [leads]);
 
-    // --- 3. TIME EVOLUTION (Line Chart) ---
     const evolutionData = useMemo(() => {
         const timeMap = {};
 
-        // Helper to safely parse dates (handles both "YYYY-MM-DD" strings and [YYYY, MM, DD] arrays from Java)
         const getMonthString = (dateVal) => {
             if (!dateVal) return null;
             if (Array.isArray(dateVal) && dateVal.length >= 2) {
@@ -59,27 +83,24 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
             return null;
         };
 
-        // Process Leads
         leads.forEach(lead => {
             const month = getMonthString(lead.creationDate);
             if (month) {
-                if (!timeMap[month]) timeMap[month] = { name: month, Leads: 0, Users: 0 };
+                if (!timeMap[month]) timeMap[month] = { name: month, Leads: 0, Clients: 0 };
                 timeMap[month].Leads += 1;
             }
         });
 
-        // Process Users
-        users.forEach(user => {
-            const month = getMonthString(user.creationDate);
+        clients.forEach(client => {
+            const month = getMonthString(client.creationDate);
             if (month) {
-                if (!timeMap[month]) timeMap[month] = { name: month, Leads: 0, Users: 0 };
-                timeMap[month].Users += 1;
+                if (!timeMap[month]) timeMap[month] = { name: month, Leads: 0, Clients: 0 };
+                timeMap[month].Clients += 1;
             }
         });
 
-        // Sort chronologically (e.g., "2024-01", "2024-02")
         return Object.values(timeMap).sort((a, b) => a.name.localeCompare(b.name));
-    }, [leads, users]);
+    }, [leads, clients]);
 
     return (
         <div className="container-fluid mt-2">
@@ -89,48 +110,58 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
                         <h6 className="text-muted">Total Users</h6>
-                        <h2 style={{ color: '#3C78B4', fontWeight: 'bold' }}>{totalUsers}</h2>
+                        <h2 className="text-dunder-blue">{totalUsers}</h2>
                     </div>
                 </div>
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
                         <h6 className="text-muted">Confirmed Accounts</h6>
-                        <h2 className="text-success" style={{ fontWeight: 'bold' }}>{confirmedAccounts}</h2>
+                        <h2 className="text-success-bold">{confirmedAccounts}</h2>
                     </div>
                 </div>
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
                         <h6 className="text-muted">Total Clients</h6>
-                        <h2 style={{ color: '#2D5A88', fontWeight: 'bold' }}>{totalClients}</h2>
+                        <h2 className="text-dunder-dark-blue">{totalClients}</h2>
                     </div>
                 </div>
                 <div className="col-md-3 mb-3">
                     <div className="card shadow-sm border-0 text-center p-3 h-100">
                         <h6 className="text-muted">Total Leads</h6>
-                        <h2 className="text-warning" style={{ fontWeight: 'bold' }}>{totalLeads}</h2>
+                        <h2 className="text-warning-bold">{totalLeads}</h2>
                     </div>
                 </div>
             </div>
 
-            {/* CHARTS ROW */}
+            {/* TOP ROW CHARTS */}
             <div className="row mb-4 d-flex align-items-stretch">
 
-                {/* DONUT: LEADS BY STATE */}
+                <div className="col-lg-7 mb-3">
+                    <div className="card shadow-sm border-0 p-3 h-100 d-flex flex-column">
+                        <h5 className="text-center mb-3">Top Sales Reps (Clients & Leads)</h5>
+                        <div className="flex-grow-1">
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={topPerformers} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E0E0E0" />
+                                    <XAxis type="number" allowDecimals={false} tick={{ fill: '#6c757d' }} />
+                                    <YAxis dataKey="name" type="category" width={100} tick={{ fill: '#6c757d', fontSize: 12 }} />
+                                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
+                                    <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                                    <Bar dataKey="Clients" stackId="a" fill="#82ca9d" radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="Leads" stackId="a" fill="#3C78B4" radius={[0, 4, 4, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="col-lg-5 mb-3">
                     <div className="card shadow-sm border-0 p-3 h-100 d-flex flex-column">
                         <h5 className="text-center mb-3">Leads by State</h5>
-                        <div className="flex-grow-1" style={{ minHeight: '300px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="flex-grow-1">
+                            <ResponsiveContainer width="100%" height={300}>
                                 <PieChart>
-                                    <Pie
-                                        data={leadsByState}
-                                        innerRadius={80}
-                                        outerRadius={110}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="#ffffff"
-                                        strokeWidth={1}
-                                    >
+                                    <Pie data={leadsByState} innerRadius={80} outerRadius={110} dataKey="value" stroke="#ffffff" strokeWidth={4}>
                                         {leadsByState.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
@@ -143,12 +174,15 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
                     </div>
                 </div>
 
-                {/* LINE CHART: EVOLUTION */}
-                <div className="col-lg-7 mb-3">
-                    <div className="card shadow-sm border-0 p-4 h-100 d-flex flex-column">
-                        <h5 className="text-center mb-4">Temporal Evolution (Users & Leads)</h5>
-                        <div className="flex-grow-1" style={{ minHeight: '300px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
+            </div>
+
+            {/* BOTTOM ROW: LINE CHART */}
+            <div className="row mb-5">
+                <div className="col-12">
+                    <div className="card shadow-sm border-0 p-4">
+                        <h5 className="text-center mb-4">Temporal Evolution (Clients & Leads)</h5>
+                        <div className="flex-grow-1">
+                            <ResponsiveContainer width="100%" height={350}>
                                 <LineChart data={evolutionData}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
                                     <XAxis dataKey="name" tick={{ fill: '#6c757d' }} />
@@ -156,13 +190,12 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
                                     <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
                                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
                                     <Line type="monotone" dataKey="Leads" stroke="#3C78B4" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                                    <Line type="monotone" dataKey="Users" stroke="#82ca9d" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                                    <Line type="monotone" dataKey="Clients" stroke="#82ca9d" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );

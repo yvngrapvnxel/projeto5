@@ -8,6 +8,7 @@ const useUserStore = create(
         id: '',
         firstName: '',
         lastName: '',
+        lang: 'en',
         email: '',
         phone: '',
         username: '',

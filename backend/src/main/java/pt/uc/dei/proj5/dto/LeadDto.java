@@ -61,6 +61,7 @@ public class LeadDto {
     public LocalDate getCreationDate() {
         return creationDate;
     }
+
     public void setCreationDate(LocalDate date){
         this.creationDate = date;
     }

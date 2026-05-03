@@ -12,6 +12,7 @@ public class UserDto {
     private String password;
     private String firstName;
     private String lastName;
+    private String lang;
     private String email;
     private String phone;
     private String photoUrl;
@@ -98,4 +99,8 @@ public class UserDto {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    @XmlElement
+    public String getLang() { return lang; }
+    public void setLang(String lang) { this.lang = lang; }
 }

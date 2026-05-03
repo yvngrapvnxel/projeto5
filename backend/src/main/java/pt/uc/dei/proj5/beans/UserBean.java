@@ -135,6 +135,7 @@ public class UserBean implements Serializable {
         dto.setPhotoUrl(e.getPhotoUrl());
         dto.setAdmin(e.isAdmin());
         dto.setActive(e.isActive());
+        dto.setLang(e.getLang());
 
         return dto;
     }
@@ -171,6 +172,10 @@ public class UserBean implements Serializable {
         String email = newData.getEmail();
         String phone = newData.getPhone();
         String photoUrl = newData.getPhotoUrl();
+        String lang = newData.getLang();
+        if (lang != null && (lang.equals("en") || lang.equals("pt"))) {
+            user.setLang(lang);
+        }
 
         if (firstName == null || lastName == null || email == null || phone == null || photoUrl == null) {
             return null;

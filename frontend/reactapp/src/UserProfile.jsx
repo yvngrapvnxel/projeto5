@@ -7,7 +7,6 @@ const ProfilePage = () => {
     const { user, setUser } = userStore();
     const [showModal, setShowModal] = useState(false);
 
-
     const [formData, setFormData] = useState({
         ...user,
         currentPassword: '',
@@ -43,6 +42,7 @@ const ProfilePage = () => {
         if (formData.email) payload.email = formData.email;
         if (formData.photoUrl) payload.photoUrl = formData.photoUrl;
         if (formData.phone) payload.phone = formData.phone;
+        if (formData.lang) payload.lang = formData.lang; // Add language to payload
 
         if (formData.newPassword && formData.newPassword.trim() !== "") {
             payload.password = formData.newPassword;
@@ -76,6 +76,12 @@ const ProfilePage = () => {
         }
     };
 
+    // Helper to display friendly language name
+    const getLanguageDisplay = (langCode) => {
+        if (langCode === 'pt') return 'Portuguese (PT)';
+        return 'English (EN)';
+    };
+
     return (
         <div className="dashboard-container">
 
@@ -97,10 +103,14 @@ const ProfilePage = () => {
                                     <label className="text-muted small fw-bold text-uppercase">Phone</label>
                                     <p className="mb-0 fw-semibold">{user.phone || 'N/A'}</p>
                                 </div>
+                                <div className="mb-3">
+                                    <label className="text-muted small fw-bold text-uppercase">Preferred Language</label>
+                                    <p className="mb-0 fw-semibold">{getLanguageDisplay(user.lang)}</p>
+                                </div>
                             </div>
                             <div className="mt-4">
-                                <button className="btn btn-primary w-100 fw-bold" style={{ backgroundColor: '#2D5A88' }}
-                                    onClick={() => { setFormData({ ...user, currentPassword: '', newPassword: '', confirmNewPassword: '' }); setShowModal(true); }}>
+                                <button className="btn w-100 fw-bold text-white" style={{ backgroundColor: '#2D5A88' }}
+                                        onClick={() => { setFormData({ ...user, currentPassword: '', newPassword: '', confirmNewPassword: '' }); setShowModal(true); }}>
                                     Edit Profile Information
                                 </button>
                             </div>
@@ -123,21 +133,47 @@ const ProfilePage = () => {
                                 <div className="modal-body p-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
 
                                     <h6 className="fw-bold mb-3" style={{ color: `#2D5A88` }}>General Information</h6>
+
                                     <div className="row mb-3">
-                                        <div className="col"><input type="text" name="firstName" className="form-control" placeholder="First Name" value={formData.firstName} onChange={handleChange} required /></div>
-                                        <div className="col"><input type="text" name="lastName" className="form-control" placeholder="Last Name" value={formData.lastName} onChange={handleChange} required /></div>
+                                        <div className="col">
+                                            <label className="form-label small text-muted mb-1">First Name</label>
+                                            <input type="text" name="firstName" className="form-control" value={formData.firstName} onChange={handleChange} required />
+                                        </div>
+                                        <div className="col">
+                                            <label className="form-label small text-muted mb-1">Last Name</label>
+                                            <input type="text" name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} required />
+                                        </div>
                                     </div>
 
                                     <div className="row mb-3">
                                         <div className="col">
-                                            <input type="email" name="email" className="form-control" placeholder="Email" value={formData.email} onChange={handleChange} required />
+                                            <label className="form-label small text-muted mb-1">Email</label>
+                                            <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
                                         </div>
                                         <div className="col">
-                                            <input type="text" name="phone" className="form-control" placeholder="Phone Number" value={formData.phone || ''} onChange={handleChange} />
+                                            <label className="form-label small text-muted mb-1">Phone</label>
+                                            <input type="text" name="phone" className="form-control" value={formData.phone || ''} onChange={handleChange} />
                                         </div>
                                     </div>
 
-                                    <div className="mb-4"><input type="url" name="photoUrl" className="form-control" placeholder="Photo URL" value={formData.photoUrl} onChange={handleChange} /></div>
+                                    <div className="row mb-4">
+                                        <div className="col-8">
+                                            <label className="form-label small text-muted mb-1">Photo URL</label>
+                                            <input type="url" name="photoUrl" className="form-control" value={formData.photoUrl} onChange={handleChange} />
+                                        </div>
+                                        <div className="col-4">
+                                            <label className="form-label small text-muted mb-1">Language</label>
+                                            <select
+                                                name="lang"
+                                                className="form-select"
+                                                value={formData.lang}
+                                                onChange={handleChange}
+                                            >
+                                                <option value="en">English</option>
+                                                <option value="pt">Português</option>
+                                            </select>
+                                        </div>
+                                    </div>
 
                                     <hr />
 
@@ -145,26 +181,26 @@ const ProfilePage = () => {
                                     <div className="p-3 bg-light rounded border mb-3">
                                         <label className="form-label small fw-bold">Change Password<br></br>(leave blank to keep current password)</label>
                                         <input type="password" name="newPassword"
-                                            className="form-control mb-2" placeholder="New Password"
-                                            value={formData.newPassword} onChange={handleChange} />
+                                               className="form-control mb-2" placeholder="New Password"
+                                               value={formData.newPassword} onChange={handleChange} />
                                         <input type="password" name="confirmNewPassword"
-                                            className="form-control" placeholder="Confirm New Password"
-                                            value={formData.confirmNewPassword} onChange={handleChange} />
+                                               className="form-control" placeholder="Confirm New Password"
+                                               value={formData.confirmNewPassword} onChange={handleChange} />
                                     </div>
 
                                     <div className="mb-2">
                                         <label className="form-label small fw-bold text-danger">Confirm Identity</label>
                                         <input type="password" name="currentPassword"
-                                            className="form-control border-danger"
-                                            placeholder="Enter Current Password to Save"
-                                            value={formData.currentPassword} onChange={handleChange} required />
+                                               className="form-control border-danger"
+                                               placeholder="Enter Current Password to Save"
+                                               value={formData.currentPassword} onChange={handleChange} required />
                                     </div>
 
                                 </div>
 
                                 <div className="modal-footer bg-light">
                                     <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary" disabled={loading} style={{ backgroundColor: '#2D5A88' }}>
+                                    <button type="submit" className="btn text-white fw-bold" disabled={loading} style={{ backgroundColor: '#2D5A88' }}>
                                         {loading ? 'Processing...' : 'Save Updates'}
                                     </button>
                                 </div>
