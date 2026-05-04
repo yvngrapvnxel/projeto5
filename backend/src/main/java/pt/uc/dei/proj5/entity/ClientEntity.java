@@ -64,6 +64,10 @@ public class ClientEntity implements Serializable {
         this.id = id;
     }
 
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
+
     public String getName() {
         return name;
     }

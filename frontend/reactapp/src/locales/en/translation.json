@@ -169,6 +169,10 @@
     "inviteFailed": "Failed to send invitation. User may already exist.",
     "updateFailed": "Failed to update ",
     "confirmDeactivateUser": "Deactivate {{name}}?",
-    "forbidden": "403 - Forbidden"
+    "forbidden": "403 - Forbidden",
+    "searchPlaceholder": "Search users...",
+    "statusPending": "Pending",
+    "pendingUser": "Pending Invite",
+    "awaitingConfirmation": "Awaiting Confirmation"
   }
 }

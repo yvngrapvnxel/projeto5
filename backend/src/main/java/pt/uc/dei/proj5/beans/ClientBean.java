@@ -65,6 +65,7 @@ public class ClientBean implements Serializable {
         client.setPhone(e.getPhone());
         client.setEmail(e.getEmail());
         client.setCompany(e.getCompany());
+        client.setCreationDate(e.getCreationDate());
 
         if (e.getUser() != null) {
             UserDto u = userBean.fromEntityToDto(e.getUser());

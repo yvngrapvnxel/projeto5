@@ -875,3 +875,38 @@ body.no-bg .dashboard-container {
 .expanded-row-content {
   animation: fadeInRow 0.3s ease forwards;
 }
+
+/* Modern Pagination Styling */
+.modern-pagination {
+  gap: 0.5rem;
+}
+
+.modern-pagination .page-item .page-link {
+  border-radius: 8px;
+  border: 1px solid rgba(45, 90, 136, 0.1);
+  color: #2D5A88;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+}
+
+.modern-pagination .page-item.active .page-link {
+  background-color: #16264A;
+  border-color: #16264A;
+  color: #ffffff;
+  box-shadow: 0 4px 6px rgba(22, 38, 74, 0.2);
+}
+
+.modern-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+  background-color: rgba(45, 90, 136, 0.1);
+  color: #16264A;
+  transform: translateY(-1px);
+}
+
+.modern-pagination .page-item.disabled .page-link {
+  background-color: rgba(255, 255, 255, 0.4);
+  color: rgba(45, 90, 136, 0.4);
+  border-color: rgba(45, 90, 136, 0.05);
+}

@@ -11,6 +11,24 @@ export const CRMRow = (props) => {
         return states[state] || "Unknown";
     };
 
+    const formatDate = (dateValue) => {
+        if (!dateValue) return 'N/A';
+        if (Array.isArray(dateValue)) {
+            const [year, month, day] = dateValue;
+            const dd = String(day).padStart(2, '0');
+            const mm = String(month).padStart(2, '0');
+            return `${dd}/${mm}/${year}`;
+        }
+        const dateObj = new Date(dateValue);
+        if (!isNaN(dateObj.getTime())) {
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            return `${dd}/${mm}/${year}`;
+        }
+        return dateValue;
+    };
+
     return (
         <tr>
 
@@ -19,7 +37,7 @@ export const CRMRow = (props) => {
                     <td className="fw-semibold">{object.title}</td>
                     <td>{object.description}</td>
                     <td>{getLeadState(object.state)}</td>
-                    <td>{object.creationDate ? object.creationDate : 'N/A'}</td>
+                    <td>{formatDate(object.creationDate)}</td>
                 </>
             ) : ( // clientes
                 <>

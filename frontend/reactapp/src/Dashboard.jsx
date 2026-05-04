@@ -31,7 +31,15 @@ const Dashboard = () => {
 
     // Fetch the user list on mount
     useEffect(() => {
-        if (isAdmin) fetchUsers();
+        if (isAdmin) {
+            document.body.classList.add('no-bg');
+            fetchUsers();
+
+            // The cleanup function must be returned at the very end
+            return () => {
+                document.body.classList.remove('no-bg');
+            };
+        }
     }, [isAdmin, fetchUsers]);
 
     // Fetch the master data once we have the users
@@ -43,7 +51,7 @@ const Dashboard = () => {
                 let tempClients = [];
                 let tempLeads = [];
 
-                // Loop through ALL users (which now securely includes you)
+                // Loop through ALL users
                 const promises = allPlatformUsers.map(async (u) => {
                     try {
                         const [cRes, lRes] = await Promise.all([
@@ -82,13 +90,13 @@ const Dashboard = () => {
                 <main className="dashboard-container dashboard-main-content">
 
                     {isLoadingStats ? (
-                    <div className="d-flex justify-content-center mt-5">
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading statistics...</span>
+                        <div className="d-flex justify-content-center mt-5">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Loading statistics...</span>
+                            </div>
                         </div>
-                    </div>
                     ) : (
-                    <AdminStatistics users={allPlatformUsers} clients={allClients} leads={allLeads}/>
+                        <AdminStatistics users={allPlatformUsers} clients={allClients} leads={allLeads} />
                     )}
                 </main>
             ) : (

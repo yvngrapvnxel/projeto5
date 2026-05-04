@@ -169,6 +169,10 @@
     "inviteFailed": "Falha ao enviar convite. O utilizador pode já existir.",
     "updateFailed": "Falha ao atualizar ",
     "confirmDeactivateUser": "Desativar {{name}}?",
-    "forbidden": "403 - Proibido"
+    "forbidden": "403 - Proibido",
+    "searchPlaceholder": "Pesquisar utilizadores...",
+    "statusPending": "Pendente",
+    "pendingUser": "Convite Pendente",
+    "awaitingConfirmation": "A Aguardar Confirmação"
   }
 }
