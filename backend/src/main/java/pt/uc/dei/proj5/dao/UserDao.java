@@ -107,15 +107,34 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
 
 
     // retorna a userEntity correspondente ou null
-//    public UserEntity getUserByUsername(String username) {
-//        try {
-//            return em.createQuery("SELECT u FROM UserEntity u WHERE u.username = :username", UserEntity.class)
-//                    .setParameter("username", username)
-//                    .getSingleResult();
-//        } catch (NoResultException e) {
-//            return null; // retorna null se não encontrar ninguém
-//        }
-//    }
+    public UserEntity getUserByUsername(String username) {
+        try {
+            return em.createQuery("SELECT u FROM UserEntity u WHERE u.username = :username", UserEntity.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null; // retorna null se não encontrar ninguém
+        }
+    }
+
+    public long countUserLeads(Long userId) {
+        return em.createQuery("SELECT COUNT(l) FROM LeadEntity l WHERE l.users.id = :userId", Long.class)
+                 .setParameter("userId", userId)
+                 .getSingleResult();
+    }
+
+    public long countUserClients(Long userId) {
+        return em.createQuery("SELECT COUNT(c) FROM ClientEntity c WHERE c.users.id = :userId", Long.class)
+                 .setParameter("userId", userId)
+                 .getSingleResult();
+    }
+
+    public long countUserWonLeads(Long userId) {
+        return em.createQuery("SELECT COUNT(l) FROM LeadEntity l WHERE l.users.id = :userId AND l.state = 4", Long.class)
+                 .setParameter("userId", userId)
+                 .getSingleResult();
+    }
+
 
 
     // --- METODOS ADMIN

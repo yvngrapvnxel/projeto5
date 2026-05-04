@@ -66,6 +66,18 @@ public class AdminBean implements Serializable {
         return dtos;
     }
 
+    public pt.uc.dei.proj5.dto.PaginatedUsersDto getPaginatedUsers(int page, int limit, String search) {
+        List<UserEntity> users = adminDao.getPaginatedUsers(page, limit, search);
+        long total = adminDao.countAllUsers(search);
+
+        List<UserDto> dtos = new ArrayList<>();
+        for(UserEntity u : users) {
+            dtos.add(userBean.fromEntityToDto(u));
+        }
+
+        return new pt.uc.dei.proj5.dto.PaginatedUsersDto(dtos, total);
+    }
+
 
     // --- INVITE USER
 

@@ -9,7 +9,7 @@ const AdminPage = () => {
     const { t } = useTranslation();
     const { user: currentUser } = useUserStore();
     const {
-        users, fetchUsers, deleteUser, reactivateUser,
+        users, fetchUsers, paginatedUsers, totalUsersCount, fetchUsersPaginated, deleteUser, reactivateUser,
         fetchUserSubData, selectedUserClients, selectedUserLeads,
         deleteClient, deleteLead, editClient, editLead,
         reactivateClient, reactivateLead, inviteUser
@@ -25,11 +25,11 @@ const AdminPage = () => {
 
     useEffect(() => {
         if (currentUser.admin) {
-            fetchUsers();
+            fetchUsersPaginated(currentPage, itemsPerPage, userSearchTerm);
+            document.body.classList.add('no-bg');
+            return () => document.body.classList.remove('no-bg');
         }
-        document.body.classList.add('no-bg');
-        return () => document.body.classList.remove('no-bg');
-    }, [currentUser, fetchUsers]);
+    }, [currentUser, currentPage, userSearchTerm, fetchUsersPaginated]);
 
 
     const toggleUserExpansion = (userId) => {
@@ -116,25 +116,9 @@ const AdminPage = () => {
     };
 
 
-    const sortedUsers = [...users]
-        .filter(u => {
-            if (!userSearchTerm) return true;
-            const term = userSearchTerm.toLowerCase();
-            return (
-                (u.firstName && u.firstName.toLowerCase().includes(term)) ||
-                (u.lastName && u.lastName.toLowerCase().includes(term)) ||
-                (u.username && u.username.toLowerCase().includes(term)) ||
-                (u.email && u.email.toLowerCase().includes(term))
-            );
-        })
-        .sort((a, b) => {
-        if (a.active !== b.active) {
-            return a.active ? -1 : 1;
-        }
-        const nameA = (a.firstName || "").toLowerCase();
-        const nameB = (b.firstName || "").toLowerCase();
-        return nameA.localeCompare(nameB);
-    });
+    // The sortedUsers logic is no longer needed since it's paginated/sorted in backend
+    // But we assign sortedUsers to paginatedUsers so we don't break the rendering below
+    const sortedUsers = paginatedUsers || [];
 
     const sortedSelectedClients = [...selectedUserClients].sort((a, b) => {
         if (a.active !== b.active) return a.active ? -1 : 1;
@@ -205,7 +189,7 @@ const AdminPage = () => {
                 {!expandedUserId ? (
                     <>
                         <div className="row g-4 mt-2">
-                            {sortedUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(u => {
+                            {sortedUsers.map(u => {
                                 const isPending = !u.active && !u.phone;
                                 const isInactive = !u.active && !!u.phone;
                                 return (
@@ -287,20 +271,20 @@ const AdminPage = () => {
                         </div>
 
                         {/* Pagination Controls */}
-                        {Math.ceil(sortedUsers.length / itemsPerPage) > 1 && (
+                        {Math.ceil(totalUsersCount / itemsPerPage) > 1 && (
                             <div className="d-flex justify-content-center mt-4">
                                 <nav>
                                     <ul className="pagination modern-pagination mb-0">
                                         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                                             <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>&laquo;</button>
                                         </li>
-                                        {[...Array(Math.ceil(sortedUsers.length / itemsPerPage))].map((_, i) => (
+                                        {[...Array(Math.ceil(totalUsersCount / itemsPerPage))].map((_, i) => (
                                             <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
                                                 <button className="page-link" onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
                                             </li>
                                         ))}
-                                        <li className={`page-item ${currentPage === Math.ceil(sortedUsers.length / itemsPerPage) ? 'disabled' : ''}`}>
-                                            <button className="page-link" onClick={() => setCurrentPage(p => Math.min(Math.ceil(sortedUsers.length / itemsPerPage), p + 1))}>&raquo;</button>
+                                        <li className={`page-item ${currentPage === Math.ceil(totalUsersCount / itemsPerPage) ? 'disabled' : ''}`}>
+                                            <button className="page-link" onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalUsersCount / itemsPerPage), p + 1))}>&raquo;</button>
                                         </li>
                                     </ul>
                                 </nav>

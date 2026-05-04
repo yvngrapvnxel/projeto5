@@ -282,4 +282,40 @@ public class UserService {
 //
 //        return Response.ok("Passwords match.").build();
 //    }
+
+    @GET
+    @Path("/profile/stats")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProfileStats(@HeaderParam("token") String token) {
+
+        if (tokenBean.invalidToken(token)) {
+            return Response.status(401).entity("Invalid token.").build();
+        }
+
+        pt.uc.dei.proj5.dto.UserStatsDto stats = userBean.getUserStats(token);
+
+        if (stats == null) {
+            return Response.status(404).entity("User not found.").build();
+        }
+
+        return Response.status(200).entity(stats).build();
+    }
+
+    @GET
+    @Path("/public/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPublicProfile(@PathParam("username") String username, @HeaderParam("token") String token) {
+
+        if (tokenBean.invalidToken(token)) {
+            return Response.status(401).entity("Invalid token.").build();
+        }
+
+        pt.uc.dei.proj5.dto.PublicProfileDto profile = userBean.getPublicProfile(username);
+
+        if (profile == null) {
+            return Response.status(404).entity("User not found.").build();
+        }
+
+        return Response.status(200).entity(profile).build();
+    }
 }

@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -39,8 +40,8 @@ html, body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   padding: 2rem 0;
   background:
-          linear-gradient(rgba(243, 244, 246, 0.5), rgba(243, 244, 246, 0.5)),
-          url('../public/bg-login-register.png');
+    linear-gradient(rgba(243, 244, 246, 0.5), rgba(243, 244, 246, 0.5)),
+    url('../public/bg-login-register.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -145,6 +146,7 @@ html, body {
     border: none;
     box-shadow: none;
   }
+
   .login-wrapper {
     background: #ffffff;
   }
@@ -177,7 +179,7 @@ nav.dashboard-nav {
   background-color: white;
   z-index: 1050;
   transition: left 0.3s ease-in-out;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar.open {
@@ -215,7 +217,7 @@ nav.dashboard-nav {
 }
 
 .crm-logo img {
-  filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.1));
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.1));
   transition: transform 0.3s ease;
 }
 
@@ -225,16 +227,16 @@ nav.dashboard-nav {
 
 .dashboard-container {
   box-sizing: border-box;
-  min-height: calc(100vh + (70px/3));
+  min-height: calc(100vh - 70px);
   width: 100%;
   background:
-          linear-gradient(rgba(243, 244, 246, 0.2), rgba(243, 244, 246, 0.2)),
-          url('../public/bg-dashboard.png');
+    linear-gradient(rgba(243, 244, 246, 0.2), rgba(243, 244, 246, 0.2)),
+    url('../public/bg-dashboard.png');
   background-size: cover;
   background-position: center 70px;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  margin-top: 50px;
+  margin-top: 70px;
   padding: 2rem;
 }
 
@@ -242,6 +244,15 @@ body.no-bg .auth-wrapper,
 body.no-bg .dashboard-container {
   background-image: none !important;
   background-color: rgb(245, 245, 245) !important;
+}
+
+
+body.profile-bg .dashboard-container {
+  background: linear-gradient(rgba(243, 244, 246, 0.4), rgba(243, 244, 246, 0.4)), url('../public/scranton.jpeg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
 }
 
 .stat-card {
@@ -283,13 +294,33 @@ body.no-bg .dashboard-container {
 }
 
 @keyframes bell-ring {
-  0% { transform: rotate(0deg); }
-  15% { transform: rotate(20deg); }
-  30% { transform: rotate(-15deg); }
-  45% { transform: rotate(10deg); }
-  60% { transform: rotate(-5deg); }
-  75% { transform: rotate(2deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(20deg);
+  }
+
+  30% {
+    transform: rotate(-15deg);
+  }
+
+  45% {
+    transform: rotate(10deg);
+  }
+
+  60% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(2deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .bell-btn i {
@@ -322,7 +353,7 @@ body.no-bg .dashboard-container {
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   margin-top: 10px;
 }
@@ -400,11 +431,11 @@ body.no-bg .dashboard-container {
 /* --- ADMIN --- */
 
 .container-forbidden {
-  height: 100vh;
+  min-height: calc(100vh - 70px);
   background:
-          linear-gradient(rgba(243, 244, 246, 0.5), rgba(243, 244, 246, 0.5)),
-          url('../public/forbidden.png');
-  margin-top: 50px;
+    linear-gradient(rgba(243, 244, 246, 0.5), rgba(243, 244, 246, 0.5)),
+    url('../public/forbidden.png');
+  margin-top: 70px;
   background-size: cover;
   background-position: center 70px;
   background-repeat: no-repeat;
@@ -433,7 +464,7 @@ body.no-bg .dashboard-container {
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s;
   display: flex;
   justify-content: center;
@@ -450,7 +481,7 @@ body.no-bg .dashboard-container {
   height: 450px;
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
@@ -689,7 +720,8 @@ body.no-bg .dashboard-container {
 }
 
 .chat-read-status.read {
-  color: #34b7f1; /* WhatsApp style blue */
+  color: #34b7f1;
+  /* WhatsApp style blue */
 }
 
 /* Chat Input Area */
@@ -764,12 +796,14 @@ body.no-bg .dashboard-container {
 
 /* Custom weights for Bootstrap's default text colors */
 .text-success-bold {
-  color: #198754; /* Standard Bootstrap success green */
+  color: #198754;
+  /* Standard Bootstrap success green */
   font-weight: bold;
 }
 
 .text-warning-bold {
-  color: #ffc107; /* Standard Bootstrap warning yellow */
+  color: #ffc107;
+  /* Standard Bootstrap warning yellow */
   font-weight: bold;
 }
 
@@ -868,8 +902,15 @@ body.no-bg .dashboard-container {
 
 /* Animations for expanding rows */
 @keyframes fadeInRow {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .expanded-row-content {
@@ -888,7 +929,7 @@ body.no-bg .dashboard-container {
   background-color: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(5px);
   margin: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
 }
 

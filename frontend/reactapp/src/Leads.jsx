@@ -147,11 +147,11 @@ const LeadsPage = () => {
                                             }}
                                             onDelete={handleDelete}
                                             onReactivate={async (id) => {
-                                                    const success = await reactivateLead(id);
-                                                    if (success) {
-                                                        fetchLeads(true);
-                                                    }
-                                                }}
+                                                const success = await reactivateLead(id);
+                                                if (success) {
+                                                    fetchLeads(true);
+                                                }
+                                            }}
                                         />
                                     )}
                                 </tbody>

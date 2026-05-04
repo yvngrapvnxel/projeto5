@@ -140,6 +140,30 @@ public class AdminService {
         return Response.status(200).entity(users).build();
     }
 
+    @GET
+    @Path("/users/paginated")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPaginatedUsers(
+            @HeaderParam("token") String token,
+            @QueryParam("page") @DefaultValue("1") int page,
+            @QueryParam("limit") @DefaultValue("10") int limit,
+            @QueryParam("search") String search) {
+
+        if (tokenBean.invalidToken(token)) {
+            return Response.status(400).entity("Invalid token.").build();
+        }
+
+        UserDto admin = userBean.getTokensUser(token);
+
+        if (admin == null || !admin.isAdmin()) {
+            return Response.status(400).entity("User not authorized.").build();
+        }
+
+        pt.uc.dei.proj5.dto.PaginatedUsersDto result = adminBean.getPaginatedUsers(page, limit, search);
+
+        return Response.status(200).entity(result).build();
+    }
+
 
     // --- REACTIVATE 1 USER
 

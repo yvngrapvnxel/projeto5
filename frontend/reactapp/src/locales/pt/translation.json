@@ -60,7 +60,10 @@
     "passwordsDoNotMatch": "As novas palavras-passe não coincidem!",
     "enterCurrentToAuthorize": "Por favor, insira a sua palavra-passe atual para autorizar as alterações.",
     "profileUpdated": "Perfil atualizado com sucesso!",
-    "connectionError": "Erro de conexão. Por favor, tente novamente."
+    "connectionError": "Erro de conexão. Por favor, tente novamente.",
+    "statsClients": "Total Clientes",
+    "statsLeads": "Total Leads",
+    "statsWon": "Leads Ganhas"
   },
   "clients": {
     "title": "Clientes",

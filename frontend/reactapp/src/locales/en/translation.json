@@ -60,7 +60,10 @@
     "passwordsDoNotMatch": "New passwords do not match!",
     "enterCurrentToAuthorize": "Please enter your current password to authorize changes.",
     "profileUpdated": "Profile updated successfully!",
-    "connectionError": "Connection error. Please try again."
+    "connectionError": "Connection error. Please try again.",
+    "statsClients": "Total Clients",
+    "statsLeads": "Total Leads",
+    "statsWon": "Won Leads"
   },
   "clients": {
     "title": "Clients",

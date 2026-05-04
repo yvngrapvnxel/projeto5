@@ -8,6 +8,7 @@ import Navbar from './Navbar';
 import ClientsPage from './Clients';
 import LeadsPage from './Leads';
 import ProfilePage from './UserProfile';
+import PublicProfile from './PublicProfile';
 import AdminPage from './AdminPage';
 import {ForgotPassword} from './ForgotPassword';
 import useUserStore from "./stores/userStore";
@@ -130,6 +131,7 @@ function GlobalApp() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/profile/:username" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/clients" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />
                 <Route path="/leads" element={<ProtectedRoute><LeadsPage /></ProtectedRoute>} />

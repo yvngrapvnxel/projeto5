@@ -35,6 +35,34 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
                 .getResultList();
     }
 
+    public List<UserEntity> getPaginatedUsers(int page, int limit, String search) {
+        String queryStr = "SELECT u FROM UserEntity u WHERE u.isAdmin = false";
+        if (search != null && !search.trim().isEmpty()) {
+            queryStr += " AND (LOWER(u.username) LIKE :search OR LOWER(u.email) LIKE :search OR LOWER(u.firstName) LIKE :search OR LOWER(u.lastName) LIKE :search)";
+        }
+        queryStr += " ORDER BY u.isActive DESC, u.firstName ASC";
+        var query = em.createQuery(queryStr, UserEntity.class);
+        if (search != null && !search.trim().isEmpty()) {
+            query.setParameter("search", "%" + search.toLowerCase() + "%");
+        }
+        return query.setFirstResult((page - 1) * limit)
+                    .setMaxResults(limit)
+                    .getResultList();
+    }
+
+    public long countAllUsers(String search) {
+        String queryStr = "SELECT COUNT(u) FROM UserEntity u WHERE u.isAdmin = false";
+        if (search != null && !search.trim().isEmpty()) {
+            queryStr += " AND (LOWER(u.username) LIKE :search OR LOWER(u.email) LIKE :search OR LOWER(u.firstName) LIKE :search OR LOWER(u.lastName) LIKE :search)";
+        }
+        var query = em.createQuery(queryStr, Long.class);
+        if (search != null && !search.trim().isEmpty()) {
+            query.setParameter("search", "%" + search.toLowerCase() + "%");
+        }
+        return query.getSingleResult();
+    }
+
+
 
     // reactivate user
     public boolean reactivateUser(UserEntity user) {

@@ -61,6 +61,10 @@ public class UserBean implements Serializable {
     public boolean confirmAccount(Map<String, String> payload) {
         String token = payload.get("token");
 
+        if (tokenBean.invalidToken(token)) {
+            return false;
+        }
+
         UserEntity user = tokenDao.getTokensUser(token);
 
         user.setFirstName(payload.get("firstName"));
@@ -107,6 +111,11 @@ public class UserBean implements Serializable {
     // --- RESET PASSWORD
 
     public boolean resetPassword(String token, String newPassword) {
+
+        if (tokenBean.invalidToken(token)) {
+            return false;
+        }
+
         UserEntity user = tokenDao.getTokensUser(token);
 
         if (user == null) {
@@ -148,13 +157,40 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- GET USER OF TOKEN
-
     // get user Entity convertida para DTO (não contém password)
     public UserDto getTokensUser(String token) {
         UserEntity entity = tokenDao.getTokensUser(token);
         if (entity == null) return null;
         return fromEntityToDto(entity);
+    }
+
+    public pt.uc.dei.proj5.dto.UserStatsDto getUserStats(String token) {
+        UserEntity entity = tokenDao.getTokensUser(token);
+        if (entity == null) return null;
+
+        long leads = userDao.countUserLeads(entity.getId());
+        long clients = userDao.countUserClients(entity.getId());
+        long wonLeads = userDao.countUserWonLeads(entity.getId());
+
+        return new pt.uc.dei.proj5.dto.UserStatsDto(leads, clients, wonLeads);
+    }
+
+    public pt.uc.dei.proj5.dto.PublicProfileDto getPublicProfile(String username) {
+        UserEntity entity = userDao.getUserByUsername(username);
+        if (entity == null || !entity.isActive()) return null;
+
+        long leads = userDao.countUserLeads(entity.getId());
+        long clients = userDao.countUserClients(entity.getId());
+        long wonLeads = userDao.countUserWonLeads(entity.getId());
+
+        pt.uc.dei.proj5.dto.PublicProfileDto publicDto = new pt.uc.dei.proj5.dto.PublicProfileDto();
+        publicDto.setFirstName(entity.getFirstName());
+        publicDto.setLastName(entity.getLastName());
+        publicDto.setUsername(entity.getUsername());
+        publicDto.setPhotoUrl(entity.getPhotoUrl());
+        publicDto.setStats(new pt.uc.dei.proj5.dto.UserStatsDto(leads, clients, wonLeads));
+
+        return publicDto;
     }
 
 

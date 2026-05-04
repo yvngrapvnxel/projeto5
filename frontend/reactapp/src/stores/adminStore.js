@@ -8,12 +8,36 @@ const admin_URL = `${API_URL}/admin`;
 const useAdminStore = create((set, get) => ({
 
     users: [],
+    paginatedUsers: [],
+    totalUsersCount: 0,
     selectedUserClients: [],
     selectedUserLeads: [],
     loading: false,
 
 
     // --- USERS
+
+    fetchUsersPaginated: async (page, limit, search) => {
+        set({ loading: true });
+        const queryParams = new URLSearchParams({
+            page: page || 1,
+            limit: limit || 10,
+            search: search || ''
+        });
+        
+        const response = await fetch(`${admin_URL}/users/paginated?${queryParams.toString()}`, {
+            headers: { 'token': localStorage.getItem('token') }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            set({ paginatedUsers: data.users, totalUsersCount: data.total });
+        }
+        else {
+            await handleAuthError(response);
+        }
+        set({ loading: false });
+    },
 
     fetchUsers: async () => {
         set({ loading: true });

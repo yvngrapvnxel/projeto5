@@ -34,11 +34,7 @@ const Dashboard = () => {
         if (isAdmin) {
             document.body.classList.add('no-bg');
             fetchUsers();
-
-            // The cleanup function must be returned at the very end
-            return () => {
-                document.body.classList.remove('no-bg');
-            };
+            return () => document.body.classList.remove('no-bg');
         }
     }, [isAdmin, fetchUsers]);
 
