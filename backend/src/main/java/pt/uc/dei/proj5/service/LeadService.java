@@ -101,6 +101,7 @@ public class LeadService {
         if (leads == null) {
             return Response.status(401).entity("No leads found.").build();
         }
+        logger.info("User {} viewed all leads. Total leads: {}", user.getUsername(), leads.size());
         return Response.status(200).entity(leads).build();
     }
 

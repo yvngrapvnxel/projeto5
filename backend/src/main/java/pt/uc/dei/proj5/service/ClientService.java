@@ -102,6 +102,7 @@ public class ClientService {
             return Response.status(404).entity("No clients found.").build();
         }
 
+        logger.info("User {} viewed all clients. Total clients: {}", user.getUsername(), clients.size());
         return Response.status(200).entity(clients).build();
     }
 

@@ -188,6 +188,7 @@ public class UserService {
             return Response.status(404).entity("User not found.").build();
         }
 
+        logger.info("User {} viewed their profile", user.getUsername());
         return Response.status(200).entity(user).build();
     }
 

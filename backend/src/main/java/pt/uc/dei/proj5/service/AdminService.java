@@ -107,6 +107,7 @@ public class AdminService {
         }
 
         UserDto userProfile = adminBean.getUser(userID);
+        logger.info("Admin {} viewed profile of user ID {}", user.getUsername(), userID);
         return Response.status(200).entity(userProfile).build();
     }
 
@@ -135,6 +136,7 @@ public class AdminService {
             return Response.status(404).entity("No users found.").build();
         }
 
+        logger.info("Admin {} viewed all users", admin.getUsername());
         return Response.status(200).entity(users).build();
     }
 
@@ -241,6 +243,7 @@ public class AdminService {
             return Response.status(404).entity("Clients not found.").build();
         }
 
+        logger.info("Admin {} viewed clients for user ID {}", admin.getUsername(), ID);
         return Response.status(200).entity(clients).build();
 
     }
@@ -385,6 +388,7 @@ public class AdminService {
             return Response.status(404).entity("Leads not found.").build();
         }
 
+        logger.info("Admin {} viewed leads for user ID {}", admin.getUsername(), ID);
         return Response.status(200).entity(leads).build();
     }
 

@@ -69,6 +69,7 @@ public class ChatService {
             usersList.add(userBean.fromEntityToDto(u));
         }
 
+        logger.info("User {} retrieved user list for chat", currentUser.getUsername());
         return Response.status(200).entity(usersList).build();
     }
 
@@ -98,6 +99,7 @@ public class ChatService {
             ));
         }
 
+        logger.info("User {} retrieved chat history with user ID {}", currentUser.getUsername(), receiverID);
         return Response.status(200).entity(chatHistory).build();
     }
 
@@ -192,6 +194,7 @@ public class ChatService {
             arrayBuilder.add(notifObj);
         }
 
+        logger.info("User {} retrieved offline notifications", currentUser.getUsername());
         return Response.status(200).entity(arrayBuilder.build().toString()).build();
     }
 }
