@@ -27,7 +27,7 @@ public class ConfirmedUserFilter implements ContainerRequestFilter {
             if (token != null) {
                 UserEntity user = tokenDao.getTokensUser(token);
                 // If user is found but is not active (pending confirmation), block with 403 Forbidden
-                if (user != null && !user.getIsActive()) {
+                if (user != null && !user.isActive()) {
                     requestContext.abortWith(
                             Response.status(Response.Status.FORBIDDEN)
                                     .entity("403 Forbidden: User account is pending confirmation and cannot perform this operation.")
