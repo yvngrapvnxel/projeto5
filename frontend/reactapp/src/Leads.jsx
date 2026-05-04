@@ -88,7 +88,7 @@ const LeadsPage = () => {
             <div className="container py-4">
                 <div className="d-flex justify-content-between mb-4">
 
-                    <h2 className="fw-bold">{t('leadsPage.title')}</h2>
+                    <h2 className="page-header-themed mb-0">{t('leadsPage.title')}</h2>
 
                     <div className="d-flex gap-3">
 
@@ -105,7 +105,7 @@ const LeadsPage = () => {
                             <option value="4">{t('leadsPage.won')}</option>
                         </select>
 
-                        <button className="btn btn-primary" style={{ backgroundColor: '#2D5A88' }} onClick={() => setShowModal(true)}>
+                        <button className="modern-btn-primary" onClick={() => setShowModal(true)}>
                             {t('leadsPage.addNew')}
                         </button>
 
@@ -119,10 +119,10 @@ const LeadsPage = () => {
                         <p className="mt-2">{t('leadsPage.loading')}</p>
                     </div>
                 ) : (
-                    <div className="card shadow-sm border-0">
-                        <div className="table-responsive">
-                            <table className="table table-hover mb-0">
-                                <thead className="table-light">
+                    <div className="glass-card mt-2">
+                        <div className="table-responsive border-0">
+                            <table className="modern-table mb-0">
+                                <thead>
                                     <tr>
                                         <th>{t('leadsPage.tableTitle')}</th>
                                         <th>{t('leadsPage.tableDescription')}</th>

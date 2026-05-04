@@ -772,3 +772,106 @@ body.no-bg .dashboard-container {
   color: #ffc107; /* Standard Bootstrap warning yellow */
   font-weight: bold;
 }
+
+/* --- MODERN DUNDER MIFFLIN THEME ENHANCEMENTS --- */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(45, 90, 136, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(22, 38, 74, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.page-header-themed {
+  font-weight: 800;
+  color: var(--text-main);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.page-header-themed::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 40px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.modern-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.modern-table thead th {
+  background-color: #f8fafc;
+  color: var(--primary-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid rgba(45, 90, 136, 0.1);
+  border-top: none;
+}
+
+.modern-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.modern-table tbody td {
+  padding: 1rem 1.5rem;
+  vertical-align: middle;
+  color: #334155;
+  border-bottom: inherit;
+}
+
+.modern-btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(45, 90, 136, 0.2);
+}
+
+.modern-btn-primary:hover {
+  background-color: var(--primary-hover);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(45, 90, 136, 0.3);
+}
+
+.modern-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(45, 90, 136, 0.2);
+}
+
+/* Animations for expanding rows */
+@keyframes fadeInRow {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.expanded-row-content {
+  animation: fadeInRow 0.3s ease forwards;
+}

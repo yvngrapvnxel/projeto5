@@ -65,8 +65,8 @@ const ClientsPage = () => {
         <div className="dashboard-container">
             <div className="container py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2 className="fw-bold">{t('clientsPage.title')}</h2>
-                    <button className="btn btn-primary" style={{ backgroundColor: '#2D5A88' }} onClick={() => { setIsEditing(false); setShowModal(true); }}>
+                    <h2 className="page-header-themed mb-0">{t('clientsPage.title')}</h2>
+                    <button className="modern-btn-primary" onClick={() => { setIsEditing(false); setShowModal(true); }}>
                         {t('clientsPage.addNew')}
                     </button>
                 </div>
@@ -77,13 +77,13 @@ const ClientsPage = () => {
                         <p className="mt-2">{t('clientsPage.loading')}</p>
                     </div>
                 ) : (
-                    <div className="card shadow-sm border-0">
-                        <div className="table-responsive">
+                    <div className="glass-card mt-2">
+                        <div className="table-responsive border-0">
                             {loading ? (
-                                <div className="spinner-border text-primary"></div>
+                                <div className="spinner-border text-primary m-4"></div>
                             ) : (
-                                <table className="table table-hover mb-0">
-                                    <thead className="table-light">
+                                <table className="modern-table mb-0">
+                                    <thead>
                                         <tr>
                                             <th>{t('clientsPage.tableName')}</th>
                                             <th>{t('clientsPage.tableCompany')}</th>

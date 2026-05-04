@@ -152,10 +152,9 @@ const AdminPage = () => {
         <div className="dashboard-container">
             <div className="container py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h2 className="fw-bold mb-0">{t('adminPage.title')}</h2>
+                    <h2 className="page-header-themed mb-0">{t('adminPage.title')}</h2>
                     <button
-                        className="btn btn-primary"
-                        style={{backgroundColor: '#2D5A88'}}
+                        className="modern-btn-primary"
                         onClick={() => {
                             setFormData({email: ''});
                             setModalConfig({show: true, type: 'invite', item: null});
@@ -165,10 +164,10 @@ const AdminPage = () => {
                     </button>
                 </div>
 
-                <div className="card shadow-sm border-0">
-                    <div className="table-responsive">
-                        <table className="table table-hover mb-0 align-middle">
-                            <thead className="table-light">
+                <div className="glass-card mt-2">
+                    <div className="table-responsive border-0">
+                        <table className="modern-table mb-0 align-middle">
+                            <thead>
                             <tr>
                                 <th className="border-0 px-4 py-3">{t('adminPage.tableUser')}</th>
                                 <th className="border-0 py-3">{t('adminPage.tableStatus')}</th>
@@ -228,19 +227,19 @@ const AdminPage = () => {
                                     </tr>
 
                                     {expandedUserId === u.id && (
-                                        <tr>
+                                        <tr className="expanded-row-content">
                                             <td colSpan="3" className="p-0 border-0">
-                                                <div className="p-4 border-bottom shadow-inner"
-                                                     style={{backgroundColor: '#f8fafc'}}>
+                                                <div className="p-4 border-bottom"
+                                                     style={{backgroundColor: '#f8fafc', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'}}>
 
                                                     {/* user details */}
 
-                                                    <div className="card border-0 shadow-sm mb-4">
+                                                    <div className="glass-card mb-4 border-0">
                                                         <div
-                                                            className="card-header bg-white fw-bold text-secondary small uppercase pt-3 border-bottom-0">
+                                                            className="bg-transparent fw-bold text-secondary small text-uppercase pt-4 px-4 pb-2 border-bottom-0">
                                                             <i className="bi bi-person-vcard me-2"></i> {t('adminPage.accountDetails')}
                                                         </div>
-                                                        <div className="card-body pt-0">
+                                                        <div className="px-4 pb-4 pt-0">
                                                             <table className="table table-sm table-hover mb-0">
                                                                 <thead className="table-light">
                                                                 <tr className="text-muted" style={{fontSize: '0.7rem'}}>
@@ -267,12 +266,12 @@ const AdminPage = () => {
                                                         {/* clients */}
 
                                                         <div className="col-md-5">
-                                                            <div className="card border-0 shadow-sm h-100">
+                                                            <div className="glass-card h-100 border-0">
                                                                 <div
-                                                                    className="card-header bg-white fw-bold border-bottom-0 pt-4"
+                                                                    className="bg-transparent fw-bold border-bottom-0 pt-4 px-4 pb-2"
                                                                     style={{color: '#2D5A88'}}>{t('adminPage.usersClients')}
                                                                 </div>
-                                                                <div className="card-body pt-0">
+                                                                <div className="px-4 pb-4 pt-0">
                                                                     {sortedSelectedClients.length > 0 ? sortedSelectedClients.map(c => (
                                                                         <div key={c.id}
                                                                              className="border-bottom py-2 d-flex justify-content-between align-items-center">
@@ -324,9 +323,9 @@ const AdminPage = () => {
                                                         {/* leads */}
 
                                                         <div className="col-md-7">
-                                                            <div className="card border-0 shadow-sm h-100">
+                                                            <div className="glass-card h-100 border-0">
                                                                 <div
-                                                                    className="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 pt-3">
+                                                                    className="bg-transparent d-flex justify-content-between align-items-center border-bottom-0 pt-4 px-4 pb-2">
                                                                     <span className="fw-bold"
                                                                           style={{color: '#2D5A88'}}>{t('adminPage.usersLeads')}</span>
                                                                     {selectedUserLeads.length > 0 ?
@@ -343,7 +342,7 @@ const AdminPage = () => {
                                                                         </select>
                                                                         : <></>}
                                                                 </div>
-                                                                <div className="card-body pt-0">
+                                                                <div className="px-4 pb-4 pt-0">
                                                                     {filteredAndSortedLeads.length > 0 ? filteredAndSortedLeads.map(l => (
                                                                         <div key={l.id}
                                                                              className="border-bottom py-2 d-flex align-items-center">
