@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
-import pt.uc.dei.proj5.beans.UserBean;
+import pt.uc.dei.proj5.bean.UserBean;
 import pt.uc.dei.proj5.dao.AdminDao;
 import pt.uc.dei.proj5.dao.MessageDao;
 import pt.uc.dei.proj5.entity.MessageEntity;

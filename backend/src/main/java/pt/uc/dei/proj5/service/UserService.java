@@ -3,8 +3,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import pt.uc.dei.proj5.beans.TokenBean;
-import pt.uc.dei.proj5.beans.UserBean;
+import pt.uc.dei.proj5.bean.TokenBean;
+import pt.uc.dei.proj5.bean.UserBean;
 import pt.uc.dei.proj5.dao.TokenDao;
 import pt.uc.dei.proj5.dao.UserDao;
 import pt.uc.dei.proj5.dto.UserDto;
@@ -107,7 +107,6 @@ public class UserService {
             if (userDao.usernameAlreadyExists(newUsername)) {
                 return Response.status(400).entity("That username is already taken. Please choose another.").build();
             }
-            user.setUsername(newUsername);
         }
 
         boolean success = userBean.confirmAccount(payload);

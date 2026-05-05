@@ -7,7 +7,7 @@ import jakarta.json.JsonObjectBuilder;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import pt.uc.dei.proj5.beans.UserBean;
+import pt.uc.dei.proj5.bean.UserBean;
 import pt.uc.dei.proj5.dao.AdminDao;
 import pt.uc.dei.proj5.dao.MessageDao;
 import pt.uc.dei.proj5.dao.TokenDao;

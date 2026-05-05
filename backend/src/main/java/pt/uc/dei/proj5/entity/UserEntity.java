@@ -36,7 +36,7 @@ public class UserEntity implements Serializable {
     @Column(name = "phone", nullable = false)
     private String phone;
 
-    @Column(name = "username", unique = true, nullable = false, updatable = false)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     @Column(name = "password", nullable = false)

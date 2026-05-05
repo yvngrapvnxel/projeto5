@@ -1,12 +1,10 @@
-package pt.uc.dei.proj5.beans;
+package pt.uc.dei.proj5.bean;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Response;
 import pt.uc.dei.proj5.dao.TokenDao;
 import pt.uc.dei.proj5.dao.UserDao;
 import pt.uc.dei.proj5.entity.UserEntity;

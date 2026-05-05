@@ -1,4 +1,4 @@
-package pt.uc.dei.proj5.beans;
+package pt.uc.dei.proj5.bean;
 
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
