@@ -33,21 +33,16 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("submit");
 
         if (formData.password !== formData.confirmPassword) {
             setMessage({ text: t('auth.passwordsDoNotMatch'), type: 'error' });
             return;
         }
 
-        console.log("BBBBBB");
-
         if (mode === 'confirm' && (!formData.email || !formData.phone)) {
             setMessage({ text: t('auth.inputMissing'), type: 'error' });
             return;
         }
-
-        console.log("dps das verificaçoes");
 
         setIsLoading(true);
         setMessage({ text: '', type: '' });
