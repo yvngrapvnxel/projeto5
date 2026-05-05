@@ -22,6 +22,7 @@ const ProtectedRoute = ({ children }) => {
     if (!token) {
         return <Navigate to="/login" replace />;
     }
+
     return children;
 };
 
@@ -122,7 +123,11 @@ function GlobalApp() {
             {localStorage.getItem('token') && window.location.pathname !== '/register' ? <ChatBox /> : null}
 
             <Routes>
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/login" element={
+                    localStorage.getItem('token')
+                        ? <Navigate to="/dashboard" replace />
+                        : <LoginPage />
+                } />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 

@@ -4,7 +4,6 @@ import jakarta.persistence.NoResultException;
 import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -37,7 +36,7 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
             return null;
         }
 
-        return em.createQuery("SELECT u FROM UserEntity u WHERE u.id != :userID", UserEntity.class)
+        return em.createQuery("SELECT u FROM UserEntity u WHERE u.id != :userID AND u.isActive", UserEntity.class)
                 .setParameter("userID", userID)
                 .getResultList();
     }
@@ -49,25 +48,6 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
                     .getSingleResult();
         return count > 0;
     }
-
-
-    public void novoUserDB(UserDto novoUser) {
-
-        UserEntity user = new UserEntity();
-
-        user.setFirstName(novoUser.getFirstName());
-        user.setLastName(novoUser.getLastName());
-        user.setPhone(novoUser.getPhone());
-        user.setEmail(novoUser.getEmail());
-        user.setPhotoUrl(novoUser.getPhotoUrl());
-        user.setUsername(novoUser.getUsername());
-        user.setPassword(novoUser.getPassword());
-        user.setIsActive(true);
-        user.setLang("en");
-
-        persist(user);
-    }
-
 
     public void updateUserDB(UserEntity user, UserDto newData){
 

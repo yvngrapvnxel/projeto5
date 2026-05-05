@@ -35,7 +35,8 @@
     "invalidLink": "Invalid Link",
     "noSecurityToken": "No security token found. Please request a new link.",
     "backToLogin": "Back to Login",
-    "passwordsDoNotMatch": "Passwords do not match!"
+    "passwordsDoNotMatch": "Passwords do not match!",
+    "inputMissing": "Incomplete fields!"
   },
   "profile": {
     "editProfile": "Edit Profile Information",

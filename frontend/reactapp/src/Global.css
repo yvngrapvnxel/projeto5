@@ -39,9 +39,13 @@ body {
   justify-content: center;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   padding: 2rem 0;
+  background:
+          linear-gradient(rgba(243, 244, 246, 0.5), rgba(243, 244, 246, 0.5)),
+          url('../public/bg-login-register.png');
   background-size: cover;
-  background: linear-gradient(rgba(243, 244, 246, 0.5), rgba(243, 244, 246, 0.5)) url('../public/bg-login-register.png') no-repeat fixed center;
-}
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;}
 
 .auth-card {
   background: rgba(255, 255, 255, 0.9);
@@ -224,8 +228,13 @@ nav.dashboard-nav {
   box-sizing: border-box;
   min-height: calc(100vh - 70px);
   width: 100%;
+  background:
+          linear-gradient(rgba(243, 244, 246, 0.2), rgba(243, 244, 246, 0.2)),
+          url('../public/bg-dashboard.png');
   background-size: cover;
-  background: linear-gradient(rgba(243, 244, 246, 0.2), rgba(243, 244, 246, 0.2)) url('../public/bg-dashboard.png') no-repeat fixed center 70px;
+  background-position: center 70px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   margin-top: 70px;
   padding: 2rem;
 }
@@ -238,8 +247,13 @@ body.no-bg .dashboard-container {
 
 
 body.profile-bg .dashboard-container {
+  background:
+          linear-gradient(rgba(243, 244, 246, 0.2), rgba(243, 244, 246, 0.2)),
+          url('../public/scranton.jpeg');
   background-size: cover !important;
-  background: linear-gradient(rgba(243, 244, 246, 0.4), rgba(243, 244, 246, 0.4)) url('../public/scranton.jpeg') no-repeat fixed center !important;
+  background-position: center 70px;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .stat-card {

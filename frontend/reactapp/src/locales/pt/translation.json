@@ -35,7 +35,8 @@
     "invalidLink": "Link Inválido",
     "noSecurityToken": "Não foi encontrado token de segurança. Por favor, solicite um novo link.",
     "backToLogin": "Voltar ao Login",
-    "passwordsDoNotMatch": "As palavras-passe não coincidem!"
+    "passwordsDoNotMatch": "As palavras-passe não coincidem!",
+    "inputMissing": "Campos incompletos!"
   },
   "profile": {
     "editProfile": "Editar Informações do Perfil",
