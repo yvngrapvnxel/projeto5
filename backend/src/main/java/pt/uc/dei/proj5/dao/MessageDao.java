@@ -33,8 +33,8 @@ public class MessageDao extends DefaultDao<MessageEntity> implements Serializabl
         return query.executeUpdate();
     }
 
+    // Returns the full conversation between two users, ordered chronologically (oldest first)
     public List<MessageEntity> getChatHistory(Long user1Id, Long user2Id) {
-        // It also orders them chronologically (oldest at the top, newest at the bottom).
         String jpql = "SELECT m FROM MessageEntity m " +
                 "WHERE (m.sender.id = :u1 AND m.receiver.id = :u2) " +
                 "   OR (m.sender.id = :u2 AND m.receiver.id = :u1) " +
@@ -47,9 +47,8 @@ public class MessageDao extends DefaultDao<MessageEntity> implements Serializabl
         return query.getResultList();
     }
 
-    // --- NEW METHOD FOR OFFLINE NOTIFICATIONS ---
+    // Fetches unread messages for the bell icon's offline notifications (newest first)
     public List<MessageEntity> getAllUnreadMessagesForUser(Long receiverId) {
-        // Find all unread messages for this specific user, newest first
         String jpql = "SELECT m FROM MessageEntity m " +
                 "WHERE m.receiver.id = :receiverId AND m.isRead = false " +
                 "ORDER BY m.timestamp DESC";

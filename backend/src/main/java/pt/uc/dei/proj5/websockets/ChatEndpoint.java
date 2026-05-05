@@ -33,12 +33,11 @@ public class ChatEndpoint {
     @Inject
     private MessageDao messageDao;
 
-    // CHANGED: Now maps a User ID to a Set of Sessions to support multiple tabs
+    // Maps userId → Set<Session> to support multiple browser tabs per user
     private static final Map<Long, Set<Session>> chatSessions = new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("id") Long senderID) {
-        // Create the Set if it doesn't exist, then add the new tab's session
         chatSessions.computeIfAbsent(senderID, k -> ConcurrentHashMap.newKeySet()).add(session);
         logger.info("User joined chat. ID: " + senderID + " | Session: " + session.getId());
     }
@@ -86,12 +85,12 @@ public class ChatEndpoint {
                 return;
             }
 
+            // READ receipt: mark messages as read in DB, then notify all tabs of the original sender
             if ("READ".equalsIgnoreCase(type != null ? type.trim() : "")) {
                 logger.debug("Processing READ receipt. Updater: " + senderID + ", Target: " + receiverID);
 
                 messageDao.markMessagesAsRead(senderID, receiverID);
 
-                // CHANGED: Send READ receipt to ALL open tabs of the original sender
                 Set<Session> originalSenderSessions = chatSessions.get(receiverID);
                 if (originalSenderSessions != null) {
                     JsonObject outgoingJson = Json.createObjectBuilder()
@@ -127,7 +126,6 @@ public class ChatEndpoint {
                     messageDao.saveMessage(newMsg);
                 }
 
-                // CHANGED: Send MESSAGE to ALL open tabs of the receiver
                 Set<Session> receiverSessions = chatSessions.get(receiverID);
                 if (receiverSessions != null) {
                     JsonObject outgoingJson = Json.createObjectBuilder()
@@ -155,9 +153,8 @@ public class ChatEndpoint {
         }
     }
 
-    // Helper method so the REST API can trigger a WebSocket push
+    // Static helper so the REST API (ChatService) can trigger a WebSocket push
     public static void sendRealTimeMessage(Long senderId, Long receiverId, String text) {
-        // CHANGED: Send REST push to ALL open tabs of the receiver
         Set<Session> receiverSessions = chatSessions.get(receiverId);
 
         if (receiverSessions != null) {

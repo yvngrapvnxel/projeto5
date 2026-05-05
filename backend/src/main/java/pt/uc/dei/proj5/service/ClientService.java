@@ -36,7 +36,6 @@ public class ClientService {
     private TokenDao tokenDao;
 
 
-    // --- ADD NEW CLIENT
 
     @POST
     @Path("/add")
@@ -45,7 +44,6 @@ public class ClientService {
     public Response addNewClient(@HeaderParam("token") String token,
                                  ClientDto newData) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -63,7 +61,6 @@ public class ClientService {
         }
 
         try {
-            // tenta registar o cliente, verifica tb se nome+empresa já existe
             ClientDto newClient = clientBean.newClient(newData, token);
             if (newClient == null) {
                 logger.warn("Failed to add client: Company's Client already registered.");
@@ -78,14 +75,12 @@ public class ClientService {
     }
 
 
-    // --- GET ALL CLIENTS
 
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getClients(@HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -107,7 +102,6 @@ public class ClientService {
     }
 
 
-    // --- EDIT CLIENT
 
     @PATCH
     @Path("/{ID}")
@@ -117,7 +111,6 @@ public class ClientService {
                                @HeaderParam("token") String token,
                                ClientDto newData) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -146,14 +139,12 @@ public class ClientService {
     }
 
 
-    // --- SOFT DELETE CLIENT
 
     @DELETE
     @Path("/{ID}")
     public Response removeClient(@PathParam("ID") Long ID,
                                  @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }

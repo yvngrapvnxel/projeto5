@@ -19,7 +19,7 @@ public class ClientDao extends DefaultDao<ClientEntity> implements Serializable 
     }
 
 
-    // check DB se já existe nome+empresa
+    // Checks for a duplicate active client with the same name+company, excluding the current record (for edits)
     public boolean nameAndCompanyAlreadyExist(String name, String company, Long ID) {
         Long count = em.createQuery(
                         "SELECT COUNT(c) FROM ClientEntity c WHERE LOWER(c.name) = LOWER(:name) AND LOWER(c.company) = LOWER(:company) AND c.isActive = true AND c.id != :ID", Long.class)
@@ -31,7 +31,6 @@ public class ClientDao extends DefaultDao<ClientEntity> implements Serializable 
     }
 
 
-    // save new client in DB
     public void addClienteDB(ClientDto newClient, UserEntity user) {
 
         ClientEntity finalClient = new ClientEntity();
@@ -47,7 +46,7 @@ public class ClientDao extends DefaultDao<ClientEntity> implements Serializable 
     }
 
 
-    // get ALL user clients
+    // Returns all clients for a user, including inactive ones (for admin visibility)
     public List<ClientEntity> getAllUserClients(UserEntity user) {
         return em.createQuery(
                         "SELECT c FROM ClientEntity c WHERE c.users.id = :ID", ClientEntity.class)
@@ -56,13 +55,11 @@ public class ClientDao extends DefaultDao<ClientEntity> implements Serializable 
     }
 
 
-    // find existing client in DB by ID
     public ClientEntity getClientById(Long ID) {
         return em.find(ClientEntity.class, ID);
     }
 
 
-    // update client's details
     public int updateClient(Long ID, ClientDto newData) {
         return em.createQuery("UPDATE ClientEntity c SET c.name = :name, c.email = :email, c.phone = :phone, c.company = :company WHERE c.id = :ID")
                 .setParameter("name", newData.getName())
@@ -74,7 +71,6 @@ public class ClientDao extends DefaultDao<ClientEntity> implements Serializable 
     }
 
 
-    // soft delete client
     public boolean softDeleteClient(Long ID) {
         ClientEntity clientDB = em.find(ClientEntity.class, ID);
         if (clientDB != null) {

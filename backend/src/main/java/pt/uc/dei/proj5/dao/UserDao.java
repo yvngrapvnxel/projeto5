@@ -17,7 +17,7 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // verifica as credenciais do login
+    // Returns the user only if credentials match AND the account is active; prevents inactive logins
     public UserEntity verifyLogin(String username, String password) {
         try {
             return em.createQuery("SELECT u FROM UserEntity u WHERE u.username = :username AND u.password = :password AND u.isActive = true", UserEntity.class)
@@ -25,7 +25,7 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
                     .setParameter("password", password)
                     .getSingleResult();
         } catch (NoResultException e) {
-            return null; // retorna null se não existir o conjunto username+password na DB ou se user estiver inativo
+            return null; 
         }
     }
 
@@ -43,7 +43,6 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // verifica se um username já existe na DB
     public boolean usernameAlreadyExists(String username) {
         Long count = em.createQuery("SELECT COUNT(u) FROM UserEntity u WHERE u.username = :username", Long.class)
                     .setParameter("username", username)
@@ -52,7 +51,6 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // regista um novo utilizador na DB
     public void novoUserDB(UserDto novoUser) {
 
         UserEntity user = new UserEntity();
@@ -71,7 +69,6 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // guarda as mudanças no perfil
     public void updateUserDB(UserEntity user, UserDto newData){
 
         UserEntity u = em.find(UserEntity.class, user.getId());
@@ -106,14 +103,13 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // retorna a userEntity correspondente ou null
     public UserEntity getUserByUsername(String username) {
         try {
             return em.createQuery("SELECT u FROM UserEntity u WHERE u.username = :username", UserEntity.class)
                     .setParameter("username", username)
                     .getSingleResult();
         } catch (NoResultException e) {
-            return null; // retorna null se não encontrar ninguém
+            return null; 
         }
     }
 
@@ -129,27 +125,10 @@ public class UserDao extends DefaultDao<UserEntity> implements Serializable {
                  .getSingleResult();
     }
 
+    // State 4 = "Won" in the lead pipeline
     public long countUserWonLeads(Long userId) {
         return em.createQuery("SELECT COUNT(l) FROM LeadEntity l WHERE l.users.id = :userId AND l.state = 4", Long.class)
                  .setParameter("userId", userId)
                  .getSingleResult();
     }
-
-
-
-    // --- METODOS ADMIN
-
-
-//    public List<UserEntity> findAllActiveUsers() {
-//        return em.createQuery("SELECT u FROM UserEntity u WHERE u.isActive = true", UserEntity.class)
-//                .getResultList();
-//    }
-
-
-
-//    public List<LeadEntity> getAllActiveLeads(UserEntity user) {
-//        return em.createQuery("SELECT l FROM LeadEntity l WHERE users = :user AND isActive = true", LeadEntity.class)
-//                .setParameter("user", user)
-//                .getResultList();
-//    }
 }

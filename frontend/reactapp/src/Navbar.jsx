@@ -35,6 +35,7 @@ const Navbar = () => {
         } catch (error) {
             console.error("Network error during logout:", error);
         }
+        // Clear all zustand stores to prevent stale data from leaking into the next session
         localStorage.removeItem('token');
         clearStore();
         useClientStore.setState({ clients: [] });
@@ -46,18 +47,15 @@ const Navbar = () => {
 
     const [showDropdown, setShowDropdown] = useState(false);
 
-    // Destructure markAllAsRead from your store
     const { notifications, markAllAsRead } = useNotificationStore();
 
-    // Count unread notifications for the badge
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    // Handle clicking the bell
     const handleBellClick = () => {
         const willOpen = !showDropdown;
         setShowDropdown(willOpen);
 
-        // Mark as read when opening the list
+        // Mark all as read the moment the user opens the dropdown
         if (willOpen && unreadCount > 0) {
             markAllAsRead();
         }
@@ -96,7 +94,6 @@ const Navbar = () => {
                 className="dashboard-nav d-flex justify-content-between align-items-center px-4 py-2 fixed-top bg-white border-bottom"
                 style={{ height: '70px' }}>
 
-                {/* LEFT SIDE: Logo & Hamburger */}
                 <div className="crm-logo d-flex align-items-center gap-3">
                     {!isLoginRegisterPage && (
                         <button
@@ -131,7 +128,6 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE: Dynamic based on Login vs Dashboard */}
                 {isLoginRegisterPage ? (
                     <div className="d-flex align-items-center gap-3">
                         <div className="d-flex flex-column align-items-end">
@@ -147,7 +143,6 @@ const Navbar = () => {
                 ) : (
                     <div className="d-flex align-items-center gap-4">
 
-                        {/* CLEANED NOTIFICATION WIDGET */}
                         <div className="notification-wrapper">
                             <button onClick={handleBellClick} className="bell-btn">
                                 <i className="bi bi-bell-fill"></i>
@@ -178,7 +173,6 @@ const Navbar = () => {
                             )}
                         </div>
 
-                        {/* USER PROFILE & LOGOUT */}
                         <div className="d-flex align-items-center gap-3">
                             <span className="fw-semibold text-muted">
                                 {t('navbar.welcome')}{', ' + (user.firstName || t('navbar.employee'))}!

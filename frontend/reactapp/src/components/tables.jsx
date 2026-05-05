@@ -32,14 +32,14 @@ export const CRMRow = (props) => {
     return (
         <tr>
 
-            {type === 'lead' ? ( // leads
+            {type === 'lead' ? (
                 <>
                     <td className="fw-semibold">{object.title}</td>
                     <td>{object.description}</td>
                     <td>{getLeadState(object.state)}</td>
                     <td>{formatDate(object.creationDate)}</td>
                 </>
-            ) : ( // clientes
+            ) : (
                 <>
                     <td className="fw-semibold">{object.name}</td>
                     <td>{object.company}</td>

@@ -13,19 +13,18 @@ const resources = {
   },
 };
 
-// Initialize i18next
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: userStore.getState().user.lang || 'en', // Default language from store
+    lng: userStore.getState().user.lang || 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     },
   });
 
-// Subscribe to zustand store changes to update language dynamically
+// Sync i18n language with zustand store so profile language changes apply immediately
 userStore.subscribe((state) => {
   const currentLang = state.user.lang;
   if (currentLang && currentLang !== i18n.language) {

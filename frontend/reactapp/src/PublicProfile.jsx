@@ -67,7 +67,6 @@ const PublicProfile = () => {
             <div className="container py-5">
                 <div className="row justify-content-center">
                     
-                    {/* STATS CARDS */}
                     <div className="col-md-3 mb-4">
                         <div className="d-flex flex-column gap-3 mt-md-4">
                             <div className="glass-card border-0 p-3 position-relative overflow-hidden" style={{ backgroundColor: '#0D1B33' }}>

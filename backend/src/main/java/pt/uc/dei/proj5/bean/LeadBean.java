@@ -29,7 +29,6 @@ public class LeadBean implements Serializable {
     UserDao userDao;
 
 
-    // --- DTO TO ENTITY
 
     public LeadEntity fromDtoToEntity(LeadDto dto) {
         if (dto == null) {
@@ -50,7 +49,6 @@ public class LeadBean implements Serializable {
     }
 
 
-    // --- ENTITY TO DTO
 
     public LeadDto fromEntityToDto(LeadEntity lead) {
         if (lead == null) {
@@ -73,7 +71,6 @@ public class LeadBean implements Serializable {
     }
 
 
-    // --- ADD NEW LEAD
 
     public LeadDto createLead(LeadDto newData) {
         LeadEntity lead = fromDtoToEntity(newData);
@@ -82,12 +79,12 @@ public class LeadBean implements Serializable {
     }
 
 
-    // --- EDIT LEAD
 
     public LeadDto editLead(UserEntity user, Long ID, LeadDto newData) {
 
         LeadEntity lead = leadDao.getLeadById(ID);
 
+        // Allow edit only if the user owns the lead or is an admin
         if (lead.getUser().getId().equals(user.getId()) || user.isAdmin()) {
             LeadEntity l = leadDao.updateLead(ID, newData);
             return fromEntityToDto(l);
@@ -97,7 +94,6 @@ public class LeadBean implements Serializable {
     }
 
 
-    // --- GET ALL LEADS
 
     public List<LeadDto> getAllLeads(Long ID) {
 
@@ -117,7 +113,6 @@ public class LeadBean implements Serializable {
     }
 
 
-    // --- SOFT DELETE LEAD
 
     public boolean softDeleteLead(UserEntity user, Long ID) {
 

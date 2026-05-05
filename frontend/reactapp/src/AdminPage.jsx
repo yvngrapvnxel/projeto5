@@ -62,7 +62,7 @@ const AdminPage = () => {
             if (success) {
                 alert(t('adminPage.inviteSuccess') + formData.email);
                 handleModalClose();
-                await fetchUsers(); // Refresh the list to show the new inactive user
+                await fetchUsers();
             } else {
                 alert(t('adminPage.inviteFailed'));
             }
@@ -116,8 +116,7 @@ const AdminPage = () => {
     };
 
 
-    // The sortedUsers logic is no longer needed since it's paginated/sorted in backend
-    // But we assign sortedUsers to paginatedUsers so we don't break the rendering below
+    // Pagination is handled server-side; this alias avoids breaking the rendering below
     const sortedUsers = paginatedUsers || [];
 
     const sortedSelectedClients = [...selectedUserClients].sort((a, b) => {
@@ -190,8 +189,8 @@ const AdminPage = () => {
                     <>
                         <div className="row g-4 mt-2">
                             {sortedUsers.map(u => {
-                                const isPending = !u.active && !u.phone;
-                                const isInactive = !u.active && !!u.phone;
+                                const isPending = !u.active && !u.phone; // Invited but hasn't confirmed yet
+                                const isInactive = !u.active && !!u.phone; // Was active, now deactivated
                                 return (
                                     <div key={u.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
                                         <div
@@ -270,7 +269,6 @@ const AdminPage = () => {
                             })}
                         </div>
 
-                        {/* Pagination Controls */}
                         {Math.ceil(totalUsersCount / itemsPerPage) > 1 && (
                             <div className="d-flex justify-content-center mt-4">
                                 <nav>
@@ -308,7 +306,6 @@ const AdminPage = () => {
                                     <div className="glass-card mb-4 border-0 overflow-hidden d-inline-block pe-md-5">
                                         <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start p-4" style={{ background: 'linear-gradient(to right, rgba(45, 90, 136, 0.05), rgba(255, 255, 255, 0.5))' }}>
 
-                                            {/* Avatar & Identity Columns */}
                                             {(() => {
                                                 const isPending = !u.active && !u.phone;
                                                 const isInactive = !u.active && !!u.phone;
@@ -348,7 +345,6 @@ const AdminPage = () => {
                                                 );
                                             })()}
 
-                                            {/* Contact Column */}
                                             <div className="d-flex flex-column align-items-center align-items-md-start text-muted small mt-md-3 pt-md-1">
                                                 <div className="d-flex align-items-center mb-2">
                                                     <i className="bi bi-envelope-fill me-2 text-secondary"></i>
@@ -364,7 +360,6 @@ const AdminPage = () => {
                                     </div>
 
                                     <div className="row g-4">
-                                        {/* clients */}
                                         <div className="col-md-6">
                                             <div className="glass-card h-100 border-0">
                                                 <div
@@ -426,7 +421,6 @@ const AdminPage = () => {
                                             </div>
                                         </div>
 
-                                        {/* leads */}
                                         <div className="col-md-6">
                                             <div className="glass-card h-100 border-0">
                                                 <div

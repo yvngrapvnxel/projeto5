@@ -17,7 +17,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // get 1 user by ID from DB
     public UserEntity getUserByID(Long ID) {
         try {
             return em.createQuery("SELECT u FROM UserEntity u WHERE u.id = :ID", UserEntity.class)
@@ -29,7 +28,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // get all non-admin users from DB
     public List<UserEntity> getAllUsers() {
         return em.createQuery("SELECT u FROM UserEntity u WHERE u.isAdmin = false", UserEntity.class)
                 .getResultList();
@@ -64,7 +62,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
 
 
 
-    // reactivate user
     public boolean reactivateUser(UserEntity user) {
         int rows = em.createQuery("UPDATE UserEntity u SET u.isActive = true WHERE u.id = :ID")
                 .setParameter("ID", user.getId())
@@ -73,7 +70,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // soft delete user
     public boolean softDeleteUser(UserEntity user) {
         int rows = em.createQuery("UPDATE UserEntity u SET u.isActive = false WHERE u.id = :ID")
                 .setParameter("ID", user.getId())
@@ -82,7 +78,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // hard delete user
     public boolean hardDeleteUser(UserEntity user) {
         UserEntity userDB = em.find(UserEntity.class, user.getId());
 
@@ -95,7 +90,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // reactivate user client
     public boolean reactivateClient(ClientEntity client) {
         int rows = em.createQuery("UPDATE ClientEntity c SET c.isActive = true WHERE c.id = :ID")
                 .setParameter("ID", client.getId())
@@ -104,7 +98,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // hard delete user client
     public boolean hardDeleteClient(Long ID) {
         ClientEntity clientDB = em.find(ClientEntity.class, ID);
 
@@ -117,7 +110,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // reactivate user lead
     public boolean reactivateLead(LeadEntity lead) {
         int rows = em.createQuery("UPDATE LeadEntity l SET l.isActive = true WHERE l.id = :ID")
                 .setParameter("ID", lead.getId())
@@ -126,7 +118,6 @@ public class AdminDao extends DefaultDao<UserEntity> implements Serializable {
     }
 
 
-    // hard delete user lead
     public boolean hardDeleteLead(Long ID) {
         LeadEntity leadDB = em.find(LeadEntity.class, ID);
 

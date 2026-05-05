@@ -14,7 +14,6 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "cliente")
-// named queries
 public class ClientEntity implements Serializable {
 
 
@@ -22,7 +21,6 @@ public class ClientEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    // --- COLUNAS
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,12 +47,11 @@ public class ClientEntity implements Serializable {
     private LocalDate creationDate;
 
     @ManyToOne
-    @JoinColumn(name = "userId") // FK
-    @OnDelete(action = OnDeleteAction.SET_NULL) // altera o campo para null quando o user associado é apagado
+    @JoinColumn(name = "userId")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private UserEntity users;
 
 
-    // --- MÉTODOS
 
     public Long getId() {
         return id;

@@ -3,9 +3,8 @@ import { create } from 'zustand';
 const useNotificationStore = create((set) => ({
     notifications: [],
 
-    // ADD THIS NEW METHOD:
+    // Hydrates the store with unread notifications fetched from the REST API on login
     setNotifications: (offlineNotifs) => set({
-        // We assume the backend will send them sorted, so we just replace the array
         notifications: offlineNotifs
     }),
 

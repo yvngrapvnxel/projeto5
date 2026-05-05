@@ -57,6 +57,7 @@ public class ChatService {
             return Response.status(401).entity("Invalid token.").build();
         }
 
+        // Exclude the current user from the list since you can't chat with yourself
         List<UserEntity> entityList = userDao.getAllUsers(senderID);
 
         if (entityList.isEmpty()) {
@@ -130,19 +131,17 @@ public class ChatService {
                                 @HeaderParam("token") String token) {
 
         try {
-            // 1. Authenticate sender using the token
+            // Pipeline: persist to DB → push via WebSocket → send bell notification
             UserEntity sender = tokenDao.getTokensUser(token);
             if (sender == null) {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token.").build();
             }
 
-            // 2. Fetch the receiver entity
             UserEntity receiver = adminDao.getUserByID(messageDto.getReceiver());
             if (receiver == null) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Receiver not found.").build();
             }
 
-            // 3. Create and save the message to the database
             MessageEntity newMsg = new MessageEntity();
             newMsg.setSender(sender);
             newMsg.setReceiver(receiver);
@@ -152,11 +151,9 @@ public class ChatService {
             messageDao.saveMessage(newMsg);
 
 
-            // 4. Send the real-time WebSocket update to the receiver
             ChatEndpoint.sendRealTimeMessage(sender.getId(), receiver.getId(), messageDto.getText());
 
 
-            // 5. Send Notification to the bell icon
             String notificationMsg = "New message from " + sender.getUsername() + ": " + messageDto.getText();
             NotificationEndpoint.sendNotification(receiver.getId(), notificationMsg);
 
@@ -177,15 +174,15 @@ public class ChatService {
             return Response.status(401).entity("Invalid token.").build();
         }
 
-        // You will need to add a method to MessageDao to get all UNREAD messages where the receiver is the currentUser
+        // Retrieves unread messages as notification objects for the bell icon
         List<MessageEntity> unreadMessages = messageDao.getAllUnreadMessagesForUser(currentUser.getId());
 
-        // We will format them into a JSON array that matches your frontend store structure
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 
         for (MessageEntity m : unreadMessages) {
             String notificationMsg = "New message from " + m.getSender().getUsername() + ": " + m.getText();
 
+            // Format as JSON matching the frontend notification store structure
             JsonObjectBuilder notifObj = Json.createObjectBuilder()
                     .add("id", m.getId()) // Use the message ID as the unique key
                     .add("message", notificationMsg)

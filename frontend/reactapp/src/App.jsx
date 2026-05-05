@@ -16,7 +16,7 @@ import useNotificationStore from './stores/notifStore';
 import './Global.css';
 import ChatBox from "./ChatBox";
 
-/* qualquer path sem token redireciona para login */
+// Redirects unauthenticated users to login; wraps all protected routes
 const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
     return children;
 };
 
-// 1. Hook de inatividade corrigido (funções movidas para dentro do useEffect)
+// Logs the user out after N minutes of inactivity (no mouse/keyboard/scroll events)
 const useIdleTimeout = (timeoutMinutes = 15) => {
     const timeoutRef = useRef(null);
 
@@ -33,7 +33,6 @@ const useIdleTimeout = (timeoutMinutes = 15) => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        // Movemos as funções para dentro para evitar o missing dependency warning
         const logoutUser = () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             alert("Sessão expirada por inatividade. Por favor, faça login novamente.");
@@ -60,14 +59,12 @@ const useIdleTimeout = (timeoutMinutes = 15) => {
 };
 
 
-// 2. GlobalApp continua igual
 function GlobalApp() {
 
     const id = useUserStore((state) => state.user.id);
     const addNotification = useNotificationStore((state) => state.addNotification);
     const setNotifications = useNotificationStore((state) => state.setNotifications);
 
-    // Inicia o timer de inatividade (15 minutos)
     useIdleTimeout(15);
 
     useEffect(() => {
@@ -75,7 +72,7 @@ function GlobalApp() {
             return;
         }
 
-        // 1. FETCH OFFLINE NOTIFICATIONS
+        // First load missed notifications from DB, then open a WebSocket for live ones
         const fetchOfflineNotifications = async () => {
             const token = localStorage.getItem('token');
             try {
@@ -98,19 +95,18 @@ function GlobalApp() {
 
         fetchOfflineNotifications();
 
-        // 2. THEN CONNECT TO WEBSOCKET FOR LIVE NOTIFICATIONS
         const socket = new WebSocket(`ws://localhost:8080/notifications/${id}`);
 
         socket.onopen = () => console.log("Connected to WebSocket for notifications.");
 
         socket.onmessage = (event) => {
-            // Live notifications are just plain text strings from your backend
             addNotification(event.data);
         };
 
         socket.onerror = (error) => console.error("Notification WS Error:", error);
 
         return () => {
+            // Handle cleanup for sockets that may still be in CONNECTING state
             if (socket.readyState === WebSocket.CONNECTING) {
                 socket.addEventListener('open', () => socket.close());
             } else {

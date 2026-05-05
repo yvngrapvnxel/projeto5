@@ -11,14 +11,14 @@ const useChatStore = create((set) => ({
 
     clearMessages: () => set({ messages: [] }),
 
-    // When the OTHER person reads YOUR messages (updates your checkmarks)
+    // Updates checkmarks on YOUR messages when the other person reads them
     markMessagesAsReadByReceiver: (readerId) => set((state) => ({
         messages: state.messages.map(msg =>
             msg.receiver == readerId ? { ...msg, isRead: true } : msg
         )
     })),
 
-    // When YOU read the OTHER person's messages while the chat is open
+    // Updates read status on THEIR messages while you have the chat window open
     markMessagesAsReadByMe: (senderId) => set((state) => ({
         messages: state.messages.map(msg =>
             msg.sender == senderId ? { ...msg, isRead: true } : msg

@@ -6,7 +6,6 @@ import { API_URL } from './config';
 import './Global.css';
 
 const Dashboard = () => {
-    // 1. Get current user & admin check
     const user = useUserStore((state) => state.user);
     const isAdmin = user?.admin === true || user?.admin === 'true';
 
@@ -17,19 +16,15 @@ const Dashboard = () => {
     const [allLeads, setAllLeads] = useState([]);
     const [isLoadingStats, setIsLoadingStats] = useState(false);
 
-    // --- NEW FIX: Ensure the logged-in admin is in the users list ---
+    // Ensure the logged-in admin appears in the user list even if getAllUsers() excludes admins
     const allPlatformUsers = useMemo(() => {
-        // If no user is logged in, just return the list
         if (!user || !user.id) return users;
 
-        // Check if the admin is already in the list
         const adminExists = users.some(u => String(u.id) === String(user.id));
 
-        // If not, append the admin to the list!
         return adminExists ? users : [...users, user];
     }, [users, user]);
 
-    // Fetch the user list on mount
     useEffect(() => {
         if (isAdmin) {
             document.body.classList.add('no-bg');
@@ -38,7 +33,6 @@ const Dashboard = () => {
         }
     }, [isAdmin, fetchUsers]);
 
-    // Fetch the master data once we have the users
     useEffect(() => {
         if (isAdmin && allPlatformUsers.length > 0) {
             const fetchPlatformData = async () => {
@@ -47,7 +41,7 @@ const Dashboard = () => {
                 let tempClients = [];
                 let tempLeads = [];
 
-                // Loop through ALL users
+                // Aggregate clients and leads across all users for platform-wide statistics
                 const promises = allPlatformUsers.map(async (u) => {
                     try {
                         const [cRes, lRes] = await Promise.all([

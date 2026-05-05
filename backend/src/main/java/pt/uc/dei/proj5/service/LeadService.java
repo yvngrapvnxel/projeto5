@@ -18,7 +18,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//test
 
 
 @Path("/leads")
@@ -40,7 +39,6 @@ public class LeadService {
     private TokenDao tokenDao;
 
 
-    // --- ADD NEW LEAD
 
     @POST
     @Path("/add")
@@ -49,7 +47,6 @@ public class LeadService {
     public Response addNewLead(@HeaderParam("token") String token,
                             LeadDto newData) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -79,14 +76,12 @@ public class LeadService {
     }
 
 
-    // --- GET ALL LEADS
 
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLeads(@HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -106,7 +101,6 @@ public class LeadService {
     }
 
 
-    // --- EDIT LEAD
 
     @PATCH
     @Path("/{ID}")
@@ -115,7 +109,6 @@ public class LeadService {
                              @HeaderParam("token") String token,
                              LeadDto newData) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -142,14 +135,12 @@ public class LeadService {
     }
 
 
-    // --- SOFT DELETE LEAD
 
     @DELETE
     @Path("/{ID}")
     public Response softDeleteLead(@PathParam("ID") Long ID,
                                    @HeaderParam("token") String token) {
 
-        // verificar se o token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }

@@ -48,11 +48,11 @@ public class AdminService {
     LeadBean leadBean;
 
 
-    // --- INVITE USERS
 
     @POST
     @Path("/users/invite")
     @Consumes(MediaType.APPLICATION_JSON)
+    // Creates an inactive user account and sends an invitation email with a 12h confirmation link
     public Response inviteUser(@HeaderParam("token") String token, Map<String, String> payload) {
 
         if (tokenBean.invalidToken(token)) {
@@ -69,10 +69,8 @@ public class AdminService {
             return Response.status(400).entity("Email is required.").build();
         }
 
-        // Create inactive user and generate 12-hour token
         String inviteToken = adminBean.createInvitation(email);
 
-        // TODO Logic to send email via MailHog
         String link = "http://localhost:3000/register?mode=confirm&email=" + email + "&token=" + inviteToken;
 
         String subject = "Dunder Mifflin CRM - Account Invitation";
@@ -87,7 +85,6 @@ public class AdminService {
     }
 
 
-    // --- GET 1 USER
 
     @GET
     @Path("/users/{ID}")
@@ -95,7 +92,6 @@ public class AdminService {
     public Response getUser(@PathParam("ID") Long userID,
                             @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -112,14 +108,12 @@ public class AdminService {
     }
 
 
-    // GET ALL USERS
 
     @GET
     @Path("/users/all")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers(@HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -165,7 +159,6 @@ public class AdminService {
     }
 
 
-    // --- REACTIVATE 1 USER
 
     @PATCH
     @Path("/users/{ID}/reactivate")
@@ -173,7 +166,6 @@ public class AdminService {
     public Response reactivateUser(@PathParam("ID") Long ID,
                                    @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -196,16 +188,15 @@ public class AdminService {
     }
 
 
-    // --- SOFT/HARD DELETE 1 USER
 
     @DELETE
     @Path("/users/{ID}/delete")
     @Produces(MediaType.APPLICATION_JSON)
+    // The "permanent" query param controls soft delete (deactivate) vs hard delete (remove from DB)
     public Response deleteUser(@PathParam("ID") Long ID,
                                @QueryParam("permanent") boolean permanent,
                                @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -235,7 +226,6 @@ public class AdminService {
     }
 
 
-    // --- GET ALL USER CLIENTS
 
     @GET
     @Path("/users/{ID}/clients/all")
@@ -243,7 +233,6 @@ public class AdminService {
     public Response getUserClients(@PathParam("ID") Long ID,
                                    @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -273,7 +262,6 @@ public class AdminService {
     }
 
 
-    // --- REACTIVATE USER CLIENT
 
     @PATCH
     @Path("/users/clients/{ID}/reactivate")
@@ -281,7 +269,6 @@ public class AdminService {
     public Response reactivateUserClient(@PathParam("ID") Long ID,
                                          @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -304,7 +291,6 @@ public class AdminService {
     }
 
 
-    // --- EDIT USER CLIENT
 
     @PATCH
     @Path("users/clients/{ID}/edit")
@@ -314,7 +300,6 @@ public class AdminService {
                                    @HeaderParam("token") String token,
                                    ClientDto newData) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -341,16 +326,15 @@ public class AdminService {
     }
 
 
-    // --- DELETE USER CLIENT
 
     @DELETE
     @Path("/clients/{ID}/delete")
     @Produces(MediaType.APPLICATION_JSON)
+    // Admin can permanently delete any client; non-permanent falls through to the regular soft delete
     public Response deleteUserClient(@PathParam("ID") Long ID,
                                      @QueryParam("permanent") boolean permanent,
                                      @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -381,7 +365,6 @@ public class AdminService {
     }
 
 
-    // GET USER LEADS
 
     @GET
     @Path("/users/{ID}/leads/all")
@@ -389,7 +372,6 @@ public class AdminService {
     public Response getUserLeads(@PathParam("ID") Long ID,
                                  @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -417,7 +399,6 @@ public class AdminService {
     }
 
 
-    // --- EDIT USER LEAD
 
     @PATCH
     @Path("/leads/{ID}/edit")
@@ -427,7 +408,6 @@ public class AdminService {
                                  @HeaderParam("token") String token,
                                  LeadDto newData) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -460,7 +440,6 @@ public class AdminService {
     public Response reactivateUserLead(@PathParam("ID") Long ID,
                                    @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -483,7 +462,6 @@ public class AdminService {
     }
 
 
-    // --- DELETE USER LEAD
 
     @DELETE
     @Path("/leads/{ID}/delete")
@@ -492,7 +470,6 @@ public class AdminService {
                                     @QueryParam("permanent") boolean permanent,
                                     @HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }

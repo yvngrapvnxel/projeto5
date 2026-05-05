@@ -15,7 +15,7 @@ public class NotificationEndpoint {
 
     private static final Logger logger = LogManager.getLogger(NotificationEndpoint.class);
 
-    // Map a User ID to a thread-safe Set of active Sessions
+    // Maps userId → Set<Session> so notifications reach every open tab
     private static final Map<Long, Set<Session>> activeSessions = new ConcurrentHashMap<>();
 
     @OnOpen
@@ -41,11 +41,11 @@ public class NotificationEndpoint {
         logger.error("WebSocket error: " + throwable.getMessage(), throwable);
     }
 
+    // Broadcasts a notification to all active sessions for a given user
     public static void sendNotification(Long id, String message) {
         Set<Session> userSessions = activeSessions.get(id);
 
         if (userSessions != null) {
-            // Broadcast the message to EVERY open tab this user has
             for (Session session : userSessions) {
                 if (session.isOpen()) {
                     try {

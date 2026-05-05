@@ -9,7 +9,6 @@ const RegisterPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    // Determine the mode from the URL: 'confirm' (default) or 'reset'
     const mode = searchParams.get('mode') || 'confirm';
     const emailFromUrl = searchParams.get('email') || '';
     const tokenFromUrl = searchParams.get('token');
@@ -43,12 +42,11 @@ const RegisterPage = () => {
         setIsLoading(true);
         setMessage({ text: '', type: '' });
 
-        // Determine endpoint and payload based on the mode
         const endpoint = mode === 'reset' ? '/users/reset-password' : '/users/confirm-account';
 
         const payload = mode === 'reset'
             ? { token: tokenFromUrl, newPassword: formData.password }
-            : { ...formData, token: tokenFromUrl }; // Sends all profile data + token
+            : { ...formData, token: tokenFromUrl };
 
         try {
             const response = await fetch(`${API_URL}${endpoint}`, {
@@ -97,7 +95,6 @@ const RegisterPage = () => {
 
                     <form onSubmit={handleSubmit}>
 
-                        {/* ONLY SHOW PROFILE FIELDS IF IN 'CONFIRM' MODE */}
                         {mode === 'confirm' && (
                             <>
                                 <div className="row mb-3">
@@ -140,7 +137,6 @@ const RegisterPage = () => {
                             </>
                         )}
 
-                        {/* PASSWORD FIELDS ARE SHOWN IN BOTH MODES */}
                         <div className={`row mb-4 ${mode === 'reset' ? 'd-flex flex-column gap-3' : ''}`}>
                             <div className="col">
                                 <label className="form-label">{mode === 'reset' ? t('auth.newPassword') : t('auth.setPassword')}</label>

@@ -1,8 +1,11 @@
 package pt.uc.dei.proj5.service;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pt.uc.dei.proj5.bean.TokenBean;
 import pt.uc.dei.proj5.bean.UserBean;
 import pt.uc.dei.proj5.dao.TokenDao;
@@ -11,8 +14,6 @@ import pt.uc.dei.proj5.dto.UserDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 @Path("/users")
@@ -34,24 +35,20 @@ public class UserService {
     TokenDao tokenDao;
 
 
-    // --- LOGIN
-
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(UserDto user) {
-
+        // Token is returned as a raw string; the client stores it and sends it in every request header
         String username = user.getUsername();
         String password = user.getPassword();
 
-        // validação de campos vazios
         if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
             logger.warn("Login failed: Incomplete data for username: {}", username);
             return Response.status(401).entity("Incomplete data.").build();
         }
 
-        // verifica o login e devolve null ou token consoante o sucesso do login
         String token = userBean.authenticate(username, password);
 
         if (token == null) {
@@ -61,14 +58,9 @@ public class UserService {
 
         logger.info("User {} logged in successfully", username);
 
-        // devolve o token ao frontend em formato JSON
-//        Map<String, String> mapaToken = Map.of("token", token);
         return Response.status(200).entity(token).build();
-
     }
 
-
-    // --- LOGOUT
 
     @POST
     @Path("/logout")
@@ -78,8 +70,6 @@ public class UserService {
         return Response.status(200).entity("Logged out successfully.").build();
     }
 
-
-    // --- CONFIRM ACCOUNT REGISTER
 
     @POST
     @Path("/confirm-account")
@@ -95,6 +85,7 @@ public class UserService {
         }
 
         UserEntity user = tokenDao.getTokensUser(token);
+        // Reject if the token's user doesn't match the email or is already confirmed
         if (user == null || !user.getEmail().equals(email) || user.isActive()) {
             return Response.status(403).entity("Account not found or is already active.").build();
         }
@@ -103,6 +94,7 @@ public class UserService {
             return Response.status(400).entity("Username is required.").build();
         }
 
+        // Only check uniqueness if the user chose a username different from their email
         if (!email.equals(newUsername)) {
             if (userDao.usernameAlreadyExists(newUsername)) {
                 return Response.status(400).entity("That username is already taken. Please choose another.").build();
@@ -120,7 +112,6 @@ public class UserService {
         return Response.status(200).entity("Account confirmed successfully!").build();
     }
 
-    // --- FORGOT PASSWORD REQUEST
 
     @POST
     @Path("/forgot-password")
@@ -140,10 +131,10 @@ public class UserService {
             return Response.status(200).entity("Recovery e-mail sent.").build();
         }
 
+        // Always return 200 to prevent email enumeration attacks
         return Response.status(200).entity("If the e-mail exists, a link was sent.").build();
     }
 
-    // --- RESET PASSWORD
 
     @POST
     @Path("/reset-password")
@@ -169,14 +160,11 @@ public class UserService {
     }
 
 
-    // --- GET PROFILE
-
     @GET
     @Path("/profile")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserProfile(@HeaderParam("token") String token) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
@@ -192,22 +180,19 @@ public class UserService {
     }
 
 
-    // --- SAVE PROFILE CHANGES
-
     @PATCH
     @Path("/profile")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    // Profile updates require the user's current password as a confirmation step
     public Response updateProfile(@HeaderParam("token") String token,
                                   @HeaderParam("confirmationPassword") String password,
                                   UserDto dadosNovos) {
 
-        // verificar se token está válido
         if (tokenBean.invalidToken(token)) {
             return Response.status(400).entity("Invalid token.").build();
         }
 
-        // verificar se passwords coincidem
         UserDto user = userBean.getTokensUser(token);
 
         if (user == null || password == null) {
@@ -218,7 +203,6 @@ public class UserService {
             return Response.status(401).entity("Wrong password.").build();
         }
 
-        // fazer e verificar update
         UserDto updated = userBean.updateUser(token, dadosNovos);
 
         if (updated == null) {
@@ -231,8 +215,6 @@ public class UserService {
     }
 
 
-    // --- UPDATE LANGUAGE
-
     @PATCH
     @Path("/language")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -244,6 +226,7 @@ public class UserService {
             return Response.status(400).entity("Invalid token.").build();
         }
 
+        // Only "en" and "pt" are supported; reject anything else
         String lang = payload.get("lang");
         if (lang == null || (!lang.equals("en") && !lang.equals("pt"))) {
             return Response.status(400).entity("Invalid language.").build();
@@ -260,27 +243,6 @@ public class UserService {
         return Response.status(200).entity(updated).build();
     }
 
-
-    //  --- CHECK MATCHING PASSWORDS
-
-//    @GET
-//    @Path("/checkPassword")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response verificaPassword(@HeaderParam("token") String token,
-//                                    @HeaderParam("confirmationPassword") String password) {
-//
-//        UserDto user = userBean.getTokensUser(token);
-//
-//        if (user == null || password == null) {
-//            return Response.status(401).entity("Invalid data.").build();
-//        }
-//
-//        if (userBean.passwordsDontMatch(user.getUsername(), password)) {
-//            return Response.status(403).entity("Passwords don't match.").build();
-//        }
-//
-//        return Response.ok("Passwords match.").build();
-//    }
 
     @GET
     @Path("/profile/stats")

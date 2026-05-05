@@ -33,7 +33,6 @@ public class ClientBean implements Serializable {
     UserBean userBean;
 
 
-    // --- REGISTER NEW CLIENT
 
     public ClientDto newClient(ClientDto newClient, String token) {
 
@@ -45,6 +44,7 @@ public class ClientBean implements Serializable {
         String name = newClient.getName();
         String company = newClient.getCompany();
 
+        // Prevent duplicate clients with the same name+company combination
         if (clientDao.nameAndCompanyAlreadyExist(name, company, null)) {
             return null;
         }
@@ -55,7 +55,6 @@ public class ClientBean implements Serializable {
     }
 
 
-    // --- ENTITY TO DTO
 
     public ClientDto fromEntityToDto(ClientEntity e) {
         ClientDto client = new ClientDto();
@@ -81,11 +80,10 @@ public class ClientBean implements Serializable {
     }
 
 
-    // --- DATA VERIFICATIONS
 
+    // Returns true if required fields are missing — name, company, and at least one contact method
     public boolean verifyData(ClientDto dto) {
 
-        // validar campos obrigatórios
         boolean noName = dto.getName() == null || dto.getName().trim().isEmpty();
         boolean noCompany = dto.getCompany() == null || dto.getCompany().trim().isEmpty();
         boolean noEmail = dto.getEmail() == null || dto.getEmail().trim().isEmpty();
@@ -95,7 +93,6 @@ public class ClientBean implements Serializable {
     }
 
 
-    // --- GET USER CLIENTS
 
     public List<ClientDto> getAllClients(UserEntity user) {
 
@@ -119,7 +116,6 @@ public class ClientBean implements Serializable {
     }
 
 
-    // --- EDIT CLIENT
 
     public ClientDto editClient(UserEntity user, Long ID, ClientDto newData) {
 
@@ -133,6 +129,7 @@ public class ClientBean implements Serializable {
             return null;
         }
 
+        // Allow edit only if the user is an admin or owns the client
         if (user.isAdmin() || client.getUser().getId().equals(user.getId())) {
             int rows = clientDao.updateClient(ID, newData);
             if (rows > 0) {
@@ -144,7 +141,6 @@ public class ClientBean implements Serializable {
     }
 
 
-    // --- SOFT DELETE CLIENT
 
     public boolean softDeleteClient(UserEntity user, Long ID) {
 

@@ -16,7 +16,6 @@ public class MessageEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    // --- COLUNAS
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,9 +50,7 @@ public class MessageEntity implements Serializable {
         this.isRead = false;
     }
 
-    // --- MÉTODOS
 
-    // getters
 
     public Long getId() {
         return id;
@@ -72,7 +69,6 @@ public class MessageEntity implements Serializable {
     }
     public  boolean isRead() { return isRead; }
 
-    // setters
 
     public void setSender(UserEntity sender) {
         this.sender = sender;

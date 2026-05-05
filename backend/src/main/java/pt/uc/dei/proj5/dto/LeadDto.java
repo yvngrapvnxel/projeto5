@@ -26,7 +26,7 @@ public class LeadDto {
         return id;
     }
 
-    public void setId(Long id) { // Added setter
+    public void setId(Long id) {
         this.id = id;
     }
 

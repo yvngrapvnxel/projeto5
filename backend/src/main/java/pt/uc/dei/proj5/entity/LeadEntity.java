@@ -19,7 +19,6 @@ public class LeadEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    // --- COLUNAS
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,12 +42,11 @@ public class LeadEntity implements Serializable {
     private boolean isActive;
 
     @ManyToOne
-    @JoinColumn(name = "userId") // FK
-    @OnDelete(action = OnDeleteAction.SET_NULL) // altera o campo para null quando o user associado é apagado
+    @JoinColumn(name = "userId")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private UserEntity users;
 
 
-    // --- MÉTODOS
 
     public Long getId() {
         return id;

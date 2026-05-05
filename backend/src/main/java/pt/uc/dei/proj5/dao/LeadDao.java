@@ -24,13 +24,12 @@ public class LeadDao extends DefaultDao<LeadEntity> implements Serializable {
     }
 
 
-    // get lead by ID in DB
     public LeadEntity getLeadById(Long ID) {
         return em.find(LeadEntity.class, ID);
     }
 
 
-    // add new lead in DB
+    // Flush and refresh to get the DB-generated ID immediately after persist
     public void newLead(LeadEntity lead) {
         em.persist(lead);
         em.flush();
@@ -38,7 +37,6 @@ public class LeadDao extends DefaultDao<LeadEntity> implements Serializable {
     }
 
 
-    // update lead's details in DB
     public LeadEntity updateLead(Long ID, LeadDto newData) {
 
         LeadEntity lead = em.find(LeadEntity.class, ID);
@@ -58,14 +56,12 @@ public class LeadDao extends DefaultDao<LeadEntity> implements Serializable {
     }
 
 
-    // get ALL user leads
     public List<LeadEntity> getAllUserLeads(Long ID) {
         UserEntity user = em.find(UserEntity.class, ID);
         return user.getLeads();
     }
 
 
-    // soft delete lead
     public boolean softDeleteLead(Long ID) {
         LeadEntity leadDB = em.find(LeadEntity.class, ID);
         if (leadDB != null) {

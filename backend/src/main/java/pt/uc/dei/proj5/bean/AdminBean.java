@@ -45,7 +45,6 @@ public class AdminBean implements Serializable {
     UserDao userDao;
 
 
-    // --- GET 1 USER
 
     public UserDto getUser(Long userID) {
         UserEntity user = adminDao.getUserByID(userID);
@@ -53,7 +52,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- GET ALL USERS
 
     public List<UserDto> getAllUsers() {
 
@@ -79,8 +77,8 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- INVITE USER
 
+    // Creates a placeholder user account with empty profile fields until the invitee confirms
     public String createInvitation(String email) {
 
         if (userDao.usernameAlreadyExists(email)) return null;
@@ -95,18 +93,16 @@ public class AdminBean implements Serializable {
         newUser.setLastName("");
         newUser.setPhone("");
         newUser.setPhotoUrl("");
-        // Password and other details are left null/empty until the user registers
 
         adminDao.persist(newUser);
 
         String rawToken = tokenBean.generateToken();
-        tokenDao.guardarTokenDB(rawToken, newUser, 12);
+        tokenDao.guardarTokenDB(rawToken, newUser, 12); // 12-hour invitation token
 
         return rawToken;
     }
 
 
-    // --- REACTIVATE USER
 
     public boolean reactivateUser(Long ID) {
 
@@ -120,7 +116,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- SOFT DELETE USER
 
     public boolean softDeleteUser(Long ID) {
 
@@ -133,7 +128,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- HARD DELETE USER
 
     public boolean hardDeleteUser(Long ID) {
 
@@ -146,7 +140,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- REACTIVATE USER CLIENT
 
     public boolean reactivateClient(Long ID) {
 
@@ -160,7 +153,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- HARD DELETE USER CLIENT
 
     public boolean deleteClient(Long ID) {
 
@@ -174,7 +166,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- REACTIVATE USER LEAD
 
     public boolean reactivateLead(Long ID) {
 
@@ -188,7 +179,6 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- HARD DELETE USER LEAD
 
     public boolean deleteLead(Long ID) {
 
@@ -202,11 +192,10 @@ public class AdminBean implements Serializable {
     }
 
 
-    // --- SEND INVITATION EMAIL
 
+    // Sends HTML emails through the local MailHog SMTP relay (port 1025)
     public boolean sendEmail(String receiver, String subject, String bodyHTML) {
         try {
-            // config mailhog
             Properties props = new Properties();
             props.put("mail.smtp.host", "localhost");
             props.put("mail.smtp.port", "1025");
@@ -215,7 +204,6 @@ public class AdminBean implements Serializable {
 
             Session session = Session.getInstance(props);
 
-            // mensagem
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress("no-reply@dundermifflin.com", "CRM Admin"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));

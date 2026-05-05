@@ -15,7 +15,6 @@ const useAdminStore = create((set, get) => ({
     loading: false,
 
 
-    // --- USERS
 
     fetchUsersPaginated: async (page, limit, search) => {
         set({ loading: true });
@@ -73,6 +72,7 @@ const useAdminStore = create((set, get) => ({
         }
     },
 
+    // Optimistic update: remove from list on hard delete, toggle active flag on soft delete
     deleteUser: async (userId, permanent = false) => {
         const response = await fetch(`${admin_URL}/users/${userId}/delete?permanent=${permanent}`, {
             method: 'DELETE',
@@ -109,7 +109,7 @@ const useAdminStore = create((set, get) => ({
 
 
 
-    // --- CLIENTS E LEADS
+    // Fetches the selected user's clients and leads for the expanded detail view
     fetchUserSubData: async (userId) => {
 
         set({ selectedUserClients: [], selectedUserLeads: [] });

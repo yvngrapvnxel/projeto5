@@ -20,7 +20,6 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
     const topPerformers = useMemo(() => {
 
         const performData = users.map(user => {
-            // We use == instead of === so it matches strings to numbers safely
             const userLeads = leads.filter(l =>
                 l.userId == user.id ||
                 l.user?.id == user.id ||
@@ -107,7 +106,6 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
     return (
         <div className="container-fluid mt-2">
 
-            {/* KPI CARDS */}
             <div className="row mb-4">
                 <div className="col-md-3 mb-3">
                     <div className="glass-card border-0 text-start p-4 h-100 position-relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(22, 38, 74, 0.1) 0%, rgba(255, 255, 255, 0.4) 100%)' }}>
@@ -139,7 +137,6 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
                 </div>
             </div>
 
-            {/* TOP ROW CHARTS */}
             <div className="row mb-4 d-flex align-items-stretch">
 
                 <div className="col-lg-7 mb-3">
@@ -182,7 +179,6 @@ const AdminStatistics = ({ users = [], clients = [], leads = [] }) => {
 
             </div>
 
-            {/* BOTTOM ROW: LINE CHART */}
             <div className="row mb-5">
                 <div className="col-12">
                     <div className="glass-card border-0 p-4">

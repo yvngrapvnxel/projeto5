@@ -24,6 +24,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
     }
 
 
+    // Tokens are SHA-256 hashed before storage so the raw token is never persisted
     public String encriptar(String token) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -35,6 +36,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
     }
 
 
+    // Persists a hashed token with a configurable expiry window (in hours)
     public void guardarTokenDB(String token, UserEntity u, int hours) {
 
         String encriptado = encriptar(token);
@@ -43,12 +45,11 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
         tokenEntity.setToken(encriptado);
         tokenEntity.setUserId(u);
         tokenEntity.setSessionDate(LocalDateTime.now());
-        tokenEntity.setExpireTime(LocalDateTime.now().plusHours(hours)); // Configurable hours
+        tokenEntity.setExpireTime(LocalDateTime.now().plusHours(hours)); 
         persist(tokenEntity);
     }
 
 
-    // get user Entity (contém password)
     public UserEntity getTokensUser(String token) {
         if (token == null) {
             return null;
@@ -66,6 +67,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
     }
 
 
+    // Counts non-expired tokens matching the hash; 0 means the token is invalid or expired
     public Long validToken(String token) {
 
         String encriptado = encriptar(token);
@@ -78,6 +80,7 @@ public class TokenDao extends DefaultDao<TokenEntity> implements Serializable {
     }
 
 
+    // Invalidates a token by setting its expiry to now rather than deleting the row
     public void setExpired(String token) {
         String encriptado = encriptar(token);
         em.createQuery("UPDATE TokenEntity t SET t.expireTime = CURRENT_TIMESTAMP WHERE t.token = :token")

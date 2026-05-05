@@ -99,7 +99,7 @@ const ProfilePage = () => {
         if (formData.email) payload.email = formData.email;
         if (formData.photoUrl) payload.photoUrl = formData.photoUrl;
         if (formData.phone) payload.phone = formData.phone;
-        if (formData.lang) payload.lang = formData.lang; // Add language to payload
+        if (formData.lang) payload.lang = formData.lang;
 
         if (formData.newPassword && formData.newPassword.trim() !== "") {
             payload.password = formData.newPassword;
@@ -138,7 +138,6 @@ const ProfilePage = () => {
             <div className="container py-5">
                 <div className="row justify-content-center">
                     
-                    {/* STATS CARDS */}
                     <div className="col-md-3 mb-4">
                         <div className="d-flex flex-column gap-3 mt-md-4">
                             <div className="glass-card border-0 p-3 position-relative overflow-hidden" style={{ backgroundColor: '#0D1B33' }}>
@@ -201,7 +200,6 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            {/* edit modal */}
             {showModal && (
                 <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
                     <div className="modal-dialog modal-dialog-centered modal-md">

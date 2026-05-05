@@ -8,7 +8,7 @@ import './Global.css';
 function ChatBox() {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
-    const [view, setView] = useState('LIST'); // 'LIST' or 'CHAT'
+    const [view, setView] = useState('LIST');
     const [searchQuery, setSearchQuery] = useState('');
     const [receiver, setReceiver] = useState(null);
     const [inputText, setInputText] = useState('');
@@ -18,6 +18,7 @@ function ChatBox() {
     const { messages, addMessage, setMessages } = useChatStore();
     const socketRef = useRef(null);
 
+    // Guards against processing the same incoming message twice in rapid succession
     const lastProcessedMessageRef = useRef(null);
 
     const formatTimestamp = (isoString) => {
@@ -34,7 +35,6 @@ function ChatBox() {
             : `${date.toLocaleDateString()} ${date.toLocaleTimeString([], timeOptions)}`;
     };
 
-    // 1. Fetch Users List
     useEffect(() => {
         if (!senderID) return;
         fetch(`${API_URL}/chat/users/${senderID}`, {
@@ -45,10 +45,10 @@ function ChatBox() {
             .catch(err => console.error("Failed to load users", err));
     }, [senderID]);
 
-    // 2. WebSocket Connection
     useEffect(() => {
         if (!senderID) return;
 
+        // Derive the WS URL from the REST API URL by swapping protocol and removing /rest
         const WS_BASE = API_URL.replace('http://', 'ws://').replace('https://', 'wss://').replace('/rest', '');
         const socket = new WebSocket(`${WS_BASE}/chat/${senderID}`);
         socketRef.current = socket;
@@ -65,7 +65,7 @@ function ChatBox() {
                         receiver: senderID,
                         text: data.text,
                         timestamp: data.timestamp || new Date().toISOString(),
-                        read: false // Standardized to 'read'[cite: 2]
+                        read: false
                     });
                 }
             } catch (error) {
@@ -76,11 +76,10 @@ function ChatBox() {
         return () => socket.close();
     }, [senderID, addMessage]);
 
-    // 3. Fetch History and Handle Read Status (Consolidated Hook)[cite: 2]
     useEffect(() => {
         if (!receiver || !senderID) return;
 
-        // Fetch History
+        // When opening a chat: load history, mark as read in DB, and send a WS read receipt
         fetch(`${API_URL}/chat/history/${receiver.id}`, {
             headers: { token: localStorage.getItem('token') }
         })
@@ -88,40 +87,33 @@ function ChatBox() {
             .then(data => setMessages(data))
             .catch(err => console.error("Error loading history:", err));
 
-        // Mark existing messages as read in DB
         fetch(`${API_URL}/chat/read/${receiver.id}`, {
             method: 'PUT',
             headers: { token: localStorage.getItem('token') }
         }).catch(err => console.error("Failed to mark read in DB", err));
 
-        // Send Read Receipt via WebSocket
         if (socketRef.current?.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify({ type: "READ", receiver: receiver.id }));
         }
     }, [receiver, senderID, setMessages]);
 
-    // 4. Auto-Read New Incoming Messages // TODO EM VEZ DE ENVIAR TODAS ENVIAR APENAS A PRIMEIRA
+    // TODO EM VEZ DE ENVIAR TODAS ENVIAR APENAS A PRIMEIRA
     useEffect(() => {
         if (!receiver || !senderID || messages.length === 0) return;
 
         const lastMsg = messages[messages.length - 1];
 
-        // NEW: If we already processed this exact message timestamp/ID, skip it!
         if (lastProcessedMessageRef.current === lastMsg.timestamp) return;
 
         if (lastMsg.sender === receiver.id && !lastMsg.read) {
-            // NEW: Instantly mark this message as processed to break the loop
             lastProcessedMessageRef.current = lastMsg.timestamp;
 
-            // Mark locally
             useChatStore.getState().markMessagesAsReadByMe(receiver.id);
 
-            // Notify sender
             if (socketRef.current?.readyState === WebSocket.OPEN) {
                 socketRef.current.send(JSON.stringify({ type: "READ", receiver: receiver.id }));
             }
 
-            // Sync with DB
             fetch(`${API_URL}/chat/read/${receiver.id}`, {
                 method: 'PUT',
                 headers: { token: localStorage.getItem('token') }
@@ -133,7 +125,7 @@ function ChatBox() {
         e.preventDefault();
         if (!inputText.trim() || !receiver) return;
 
-        const messagePayload = {   type: "MESSAGE", receiver: receiver.id, text: inputText };
+        const messagePayload = { type: "MESSAGE", receiver: receiver.id, text: inputText };
         console.log("messagePayload: ", messagePayload);
 
         fetch(`${API_URL}/chat/send`, {

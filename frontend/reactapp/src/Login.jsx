@@ -64,7 +64,7 @@ const LoginPage = () => {
 
                 if (userResponse.ok) {
                     const userData = await userResponse.json();
-                    setUser(userData); // save in userStore
+                    setUser(userData);
                     navigate('/dashboard');
                 } else {
                     setMessage({ text: "Session started, but profile failed to load.", type: 'error' });

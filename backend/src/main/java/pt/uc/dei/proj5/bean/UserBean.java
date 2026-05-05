@@ -27,35 +27,37 @@ public class UserBean implements Serializable {
     @Inject
     AdminBean adminBean;
 
+    @Inject
+    UserStatsDto userStatsDto;
 
-    // --- LOGIN
+    @Inject
+    PublicProfileDto publicProfileDto;
+
+
+
+    // Returns a session token on success, or null if credentials are invalid/user is inactive
     public String authenticate(String username, String password) {
-        // retorna a Entity correspondente ao username+password ou null em caso contrário
         UserEntity u = userDao.verifyLogin(username, password);
 
-        // se user é null ou está inativo, o login não é efetuado então retorna null
         if (u == null || !u.isActive()) {
             return null;
         }
 
-        // gera e guarda o token
         String token = tokenBean.generateToken();
-        tokenDao.guardarTokenDB(token, u, 1);
+        tokenDao.guardarTokenDB(token, u, 1); // 1-hour session token
 
-        // retorna o token
         return token;
     }
 
 
-    // --- LOGOUT
 
     public void logout(String token) {
         tokenDao.setExpired(token);
     }
 
 
-    // --- CONFIRM ACCOUNT REGISTER
 
+    // Activates a pending account and sets the profile fields from the invitation form
     public boolean confirmAccount(Map<String, String> payload) {
         String token = payload.get("token");
 
@@ -81,7 +83,7 @@ public class UserBean implements Serializable {
         return true;
     }
 
-    // --- REQUEST PASSWORD RESET
+    // Generates a time-limited token and emails a reset link via MailHog
     public boolean requestPasswordReset(String email) {
         List<UserEntity> users = userDao.passwordReset(email);
         if (users.isEmpty()) {
@@ -106,7 +108,6 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- RESET PASSWORD
 
     public boolean resetPassword(String token, String newPassword) {
 
@@ -128,8 +129,8 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- ENTITY PARA DTO
 
+    // Converts entity to DTO without the password field for safe API responses
     public UserDto fromEntityToDto(UserEntity e) {
         UserDto dto = new UserDto();
 
@@ -148,21 +149,19 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- DTO PARA ENTITY
 
     public UserEntity fromDtoToEntity(UserDto user) {
         return userDao.findEntity(user.getId());
     }
 
 
-    // get user Entity convertida para DTO (não contém password)
     public UserDto getTokensUser(String token) {
         UserEntity entity = tokenDao.getTokensUser(token);
         if (entity == null) return null;
         return fromEntityToDto(entity);
     }
 
-    public pt.uc.dei.proj5.dto.UserStatsDto getUserStats(String token) {
+    public UserStatsDto getUserStats(String token) {
         UserEntity entity = tokenDao.getTokensUser(token);
         if (entity == null) return null;
 
@@ -170,10 +169,10 @@ public class UserBean implements Serializable {
         long clients = userDao.countUserClients(entity.getId());
         long wonLeads = userDao.countUserWonLeads(entity.getId());
 
-        return new pt.uc.dei.proj5.dto.UserStatsDto(leads, clients, wonLeads);
+        return new UserStatsDto(leads, clients, wonLeads);
     }
 
-    public pt.uc.dei.proj5.dto.PublicProfileDto getPublicProfile(String username) {
+    public PublicProfileDto getPublicProfile(String username) {
         UserEntity entity = userDao.getUserByUsername(username);
         if (entity == null || !entity.isActive()) return null;
 
@@ -181,18 +180,17 @@ public class UserBean implements Serializable {
         long clients = userDao.countUserClients(entity.getId());
         long wonLeads = userDao.countUserWonLeads(entity.getId());
 
-        pt.uc.dei.proj5.dto.PublicProfileDto publicDto = new pt.uc.dei.proj5.dto.PublicProfileDto();
+        PublicProfileDto publicDto = new PublicProfileDto();
         publicDto.setFirstName(entity.getFirstName());
         publicDto.setLastName(entity.getLastName());
         publicDto.setUsername(entity.getUsername());
         publicDto.setPhotoUrl(entity.getPhotoUrl());
-        publicDto.setStats(new pt.uc.dei.proj5.dto.UserStatsDto(leads, clients, wonLeads));
+        publicDto.setStats(new UserStatsDto(leads, clients, wonLeads));
 
         return publicDto;
     }
 
 
-    // --- SAVE PROFILE CHANGES
 
     public UserDto updateUser(String token, UserDto newData) {
         UserEntity user = tokenDao.getTokensUser(token);
@@ -222,7 +220,6 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- UPDATE LANGUAGE
 
     public UserDto updateLanguage(String token, String lang) {
         UserEntity user = tokenDao.getTokensUser(token);
@@ -237,8 +234,8 @@ public class UserBean implements Serializable {
     }
 
 
-    // --- CHECK MATCHING PASSWORDS
 
+    // Compares plaintext passwords — relies on passwords not being hashed in DB
     public boolean passwordsDontMatch(String token, String password) {
 
         UserEntity user = tokenDao.getTokensUser(token);

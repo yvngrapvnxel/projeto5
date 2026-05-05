@@ -17,7 +17,6 @@ public class UserEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    // --- COLUNAS
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,9 +67,7 @@ public class UserEntity implements Serializable {
 
 
 
-    // --- MÉTODOS
 
-    // getters
 
     public Long getId() {
         return id;
@@ -128,7 +125,6 @@ public class UserEntity implements Serializable {
         return leads;
     }
 
-    // setters
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;

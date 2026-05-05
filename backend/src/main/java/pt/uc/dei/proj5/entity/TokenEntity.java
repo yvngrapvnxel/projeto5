@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "token")
-// named queries
 public class TokenEntity implements Serializable {
 
 
@@ -20,7 +19,6 @@ public class TokenEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    // --- COLUNAS
 
     @Id
     @Column(name = "token", nullable = false, updatable = false)
@@ -34,12 +32,11 @@ public class TokenEntity implements Serializable {
     private LocalDateTime expireTime;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false, updatable = false) // FK
-    @OnDelete(action = OnDeleteAction.CASCADE) // apaga o token quando o user associado é apagado
+    @JoinColumn(name = "userId", nullable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity users;
 
 
-    // --- MÉTODOS
 
     public Long getUserId() {
         return users.getId();
