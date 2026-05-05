@@ -7,6 +7,8 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import pt.uc.dei.proj5.dao.TokenDao;
 import pt.uc.dei.proj5.dao.UserDao;
+import pt.uc.dei.proj5.dto.PublicProfileDto;
+import pt.uc.dei.proj5.dto.UserStatsDto;
 import pt.uc.dei.proj5.entity.UserEntity;
 import pt.uc.dei.proj5.dto.UserDto;
 
@@ -26,13 +28,6 @@ public class UserBean implements Serializable {
 
     @Inject
     AdminBean adminBean;
-
-    @Inject
-    UserStatsDto userStatsDto;
-
-    @Inject
-    PublicProfileDto publicProfileDto;
-
 
 
     // Returns a session token on success, or null if credentials are invalid/user is inactive
@@ -235,7 +230,7 @@ public class UserBean implements Serializable {
 
 
 
-    // Compares plaintext passwords — relies on passwords not being hashed in DB
+    // Compares plaintext passwords (passwords are not hashed in DB)
     public boolean passwordsDontMatch(String token, String password) {
 
         UserEntity user = tokenDao.getTokensUser(token);
